@@ -60,23 +60,7 @@ XMFLOAT4X4 Entity::getWorldMatrix()
 	return worldMatrix;
 }
 
-void Entity::setPosition(XMFLOAT3 newPos)
-{
-	position = XMFLOAT4X4
-		(newPos.x, position._12, position._13, position._14,
-			position._21, newPos.y, position._23, position._24,
-			position._31, position._32, newPos.z, position._34,
-			position._41, position._42, position._43, position._44); 
-}
 
-void Entity::setRotation(XMFLOAT4 newRot)
-{
-	rotation = XMFLOAT4X4
-		(newRot.x, rotation._12, rotation._13, rotation._14,
-			rotation._21, newRot.y, rotation._23, rotation._24,
-			rotation._31, rotation._32, newRot.z, rotation._34,
-			rotation._41, rotation._42, rotation._43, newRot.w);
-}
 
 void Entity::setScale(XMFLOAT3 newScale)
 {

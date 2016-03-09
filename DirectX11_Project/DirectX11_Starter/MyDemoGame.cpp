@@ -112,7 +112,7 @@ MyDemoGame::~MyDemoGame()
 	delete meshThree;
 
 	//Delete Entities
-	for (int i = 0; i < entities.size(); i++)
+	for (unsigned int i = 0; i < entities.size(); i++)
 	{
 		delete entities[i];
 	}
@@ -247,7 +247,7 @@ void MyDemoGame::CreateGeometry()
 
 
 	//meshOne = new Mesh(vertices, (int)sizeof(vertices), indices, sizeof(indices), device);
-	meshOne = new Mesh("Models/cube.obj", device); 
+	meshOne = new Mesh("Models/flatsurface.obj", device); 
 
 
 	//Create second Mesh
@@ -286,7 +286,10 @@ void MyDemoGame::CreateGeometry()
 	entities.push_back(e2);
 	entities.push_back(e3);
 	
-
+	//set pos of track 
+	entities[0]->move(XMFLOAT4(1.0f, -3.0f, 1.0f, 1.0f)); 
+	entities[0]->scale(XMFLOAT4(1.0f, 1.5f, 1.0f, 1.0f)); 
+	
 }
 
 
@@ -364,20 +367,17 @@ void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 	float rotation = 0.55f * deltaTime;
 	float buffer = 1.5f; 
 	//update entities
-	for (int i = 0; i < entities.size(); i++)
+	for (unsigned int i = 0; i < entities.size(); i++)
 	{
 		//rotate all entities 
 		//entities[i]->rotate(XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f), rotation);
 	}
 
 	//Check if mouse held
-	if (leftmouseHeld) { entities[0]->move(XMFLOAT4(speed, 0.f, 0.0f, 0.0f)); }
-	if (middlemouseHeld) { entities[1]->move(XMFLOAT4(speed, 0.f, 0.0f, 0.0f)); }
-	if (rightmouseHeld) { entities[2]->move(XMFLOAT4(speed, 0.f, 0.0f, 0.0f)); }
-
+	
 
 	//update all entities 
-	for (int i = 0; i < entities.size(); i++)
+	for (unsigned int i = 0; i < entities.size(); ++i)
 	{
 		entities[i]->updateScene();
 	}
@@ -423,15 +423,6 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
 		//  - This is actually a complex process of copying data to a local buffer
 		//    and then copying that entire buffer to the GPU.  
 		//  - The "SimpleShader" class handles all of that for you.
-		//XMFLOAT4X4 wm = entities[i]->getWorldMatrix();
-		//vertexShader->SetMatrix4x4("world", wm);
-		//vertexShader->CopyAllBufferData();
-		////draw here 
-		//entities[i]->drawScene(deviceContext);
-		////vertexShader->SetMatrix4x4("view", viewMatrix);
-		//vertexShader->SetMatrix4x4("view", cam->getViewMatrix());
-		//vertexShader->SetMatrix4x4("projection", cam->getProjectionMatrix());
-
 		entities[i]->prepareMaterial(cam->getViewMatrix(), cam->getProjectionMatrix()); 
 		//draw here 
 		entities[i]->drawScene(deviceContext);
@@ -498,8 +489,8 @@ void MyDemoGame::OnMouseUp(WPARAM btnState, int x, int y)
 void MyDemoGame::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	//calc Cam coords
-	float camX = x - prevMousePos.x;
-	float camY = y - prevMousePos.y;
+	float camX = x - (float)prevMousePos.x;
+	float camY = y - (float)prevMousePos.y;
 	// Save the previous mouse position, so we have it for the future
 	prevMousePos.x = x;
 	prevMousePos.y = y;

@@ -5,7 +5,7 @@
 Camera::Camera()
 {
 	//initialize attributes
-	position = XMFLOAT3(0.0f, 0.0f, -5.0f); 
+	position = XMFLOAT3(0.0f, -3.0f, -5.0f); 
 	direction = XMFLOAT3(0.0f, 0.0f, 1.0f); 
 	left = XMFLOAT3(0.0f, 0.0f, 0.0f); 
 	up = XMFLOAT3(0.0f, 1.0f, 0.0f); 
@@ -17,9 +17,9 @@ Camera::Camera()
 	XMStoreFloat4x4(&rotationMatrix, rotMat); 
 
 	//initialize viewMatrix 
-	XMVECTOR pos = XMVectorSet(0, 0, -5, 0);
+	XMVECTOR pos = XMVectorSet(0, -3.0f, -5.0f, 0);
 	XMVECTOR dir = XMVectorSet(0, 0, 1, 0);
-	XMVECTOR up = XMVectorSet(0, 1, 0, 0);
+	XMVECTOR up = XMVectorSet(0, 1.0, 0, 0);
 	XMMATRIX V = XMMatrixLookToLH(
 		pos,     // The position of the "camera"
 		dir,     // Direction the camera is looking
