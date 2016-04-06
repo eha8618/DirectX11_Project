@@ -1,4 +1,6 @@
+
 #include "Entity.h"
+#include "MyDemoGame.h"
 
 
 
@@ -9,35 +11,127 @@ Entity::Entity()
 
 Entity::~Entity()
 {
+	collider = nullptr; 
+	motionState = nullptr; 
+	delete motionState;
+	delete collider;
+	collisionShape = nullptr; 
+	delete collisionShape;
+
 }
 
-Entity::Entity(Mesh * inputMesh, Material* inputMaterial)
+
+// Helper functions 
+
+// Converts an XMFLOAT3 to a btVector3 -- Richard Selneck  
+static inline btVector3 XMtoBT(const XMFLOAT3& xm)
 {
-	mesh = inputMesh; 
-	material = inputMaterial; 
+	return btVector3(xm.x, xm.y, xm.z);
+}
+
+// Converts a btVector3 to an XMFLOAT3 -- Richard Selneck 
+static inline XMFLOAT3 BTtoXM(const btVector3& bt)
+{
+	return DirectX::XMFLOAT3(bt.getX(), bt.getY(), bt.getZ());
+}
+
+// Copies Bullet's transform to our transform
+void Entity::CopyTransformFromBullet()
+{
+	// Get the two transforms
+	btTransform  btTrans;
+	motionState->getWorldTransform(btTrans);
+	
+
+	// Copy the position
+	XMFLOAT3 position = BTtoXM(btTrans.getOrigin());
+	setPosition(position.x, position.y, position.z);
+
+	// Copy the rotation
+	//btQuaternion btRot = btTrans.getRotation();
+	//XMFLOAT4 xmRot(
+	//    btRot.getX(),
+	//    btRot.getY(),
+	//    btRot.getZ(),
+	//    btRot.getW()
+	//);
+	//myTrans.SetRotation( xmRot );
+}
+
+// Copies our transform to Bullet's transform
+void Entity::CopyTransformToBullet()
+{
+	// Get the two transforms
+	btTransform  btTrans;
+	motionState->getWorldTransform(btTrans);
+
+
+	XMFLOAT3 currentPos = XMFLOAT3(position._14, position._24, position._34); 
+
+	// Copy the position
+	btTrans.setOrigin(XMtoBT(currentPos));
+
+	//// Copy the rotation
+	//XMFLOAT4 xmRot = myTrans.GetRotation();
+	//btQuaternion btRot(xmRot.x, xmRot.y, xmRot.z, xmRot.w);
+	//btTrans.setRotation(btRot);
+
+	// Now set the transform
+	motionState->setWorldTransform(btTrans);
+	collider->setWorldTransform(btTrans);
+}
+
+Entity::Entity(Mesh * inputMesh, Material* inputMaterial, btCollisionShape* colliderShape, btDefaultMotionState* mState, btRigidBody* colliderTemp)
+{
+	//Phsyics 
+	collisionShape = colliderShape;
+	motionState = mState;
+	collider = colliderTemp;
+	//collider->setCcdMotionThreshold(1);
+	//collider->setCcdSweptSphereRadius(0.2f); 
+	//MyDemoGame::dynamicsWorld->addRigidBody(colliderTemp);
+
+	//Find position
+	btTransform trans; 
+	motionState->getWorldTransform(trans);
+	btVector3 pos = trans.getOrigin();
+	btMatrix3x3 matrix = trans.getBasis(); 
+
+	float x = pos.getX();
+	float y = pos.getY();
+	float z = pos.getZ();
+
+	
+	
+	// Graphics 
+	mesh = inputMesh;
+	material = inputMaterial;
 	position = XMFLOAT4X4(
+		1.0f, 0.0f, 0.0f, x,
+		0.0f, 1.0f, 0.0f, y,
+		0.0f, 0.0f, 1.0f, z,
+		0, 0,0, 1.0f);
+	rotation = XMFLOAT4X4(
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f);
-	rotation = XMFLOAT4X4(
-		1.0f, 0.0f, 0.0f, 0.0f, 
-		0.0f, 1.0f, 0.0f, 0.0f, 
-		0.0f, 0.0f, 1.0f, 0.0f , 
 		0.0f, 0.0f, 0.0f, 1.0f);
 	scalar = XMFLOAT4X4(
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f);
-	
+
 	worldMatrix = XMFLOAT4X4(
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f);
-	/*XMMATRIX W = XMMatrixIdentity();
-	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(W));*/
+
+	//move(XMFLOAT4(x, y, z, 1.0f)); 
+	//trans.setIdentity(); 
+	//trans.setOrigin(btVector3(position._11, position._22, position._33));
+	//trans.setOrigin(btVector3(position._14, position._22, position._33));
 }
 
 XMFLOAT4X4 Entity::getPosition()
@@ -60,10 +154,25 @@ XMFLOAT4X4 Entity::getWorldMatrix()
 	return worldMatrix;
 }
 
+void Entity::setPosition(float x, float y, float z)
+{
+	/*position = XMFLOAT4X4(
+		1.0f, 0.0f, 0.0f, x,
+		0.0f, 1.0f, 0.0f, y,
+		0.0f, 0.0f, 1.0f, z, 
+		0.0f, 0.0f, 0.0f, 1.0f);*/
+	position = XMFLOAT4X4(
+		1.0f, 0.0f, 0.0f, 0,
+		0.0f, 1.0f, 0.0f, 0,
+		0.0f, 0.0f, 1.0f, 0,
+		x, y, z, 1.0f);
+}
+
 
 
 void Entity::setScale(XMFLOAT3 newScale)
 {
+	
 	scalar = XMFLOAT4X4
 		(newScale.x * scalar._11, scalar._12, scalar._13, scalar._14,
 			scalar._21, newScale.y * scalar._23, scalar._23, scalar._24,
@@ -78,19 +187,54 @@ void Entity::setWorldMatrix(XMFLOAT4X4 newWorldMatrix)
 
 void Entity::updateScene()
 {
+	
 	//update mesh if at all
+	//Find position
+	/*btTransform trans = collider->getWorldTransform();
+	btVector3 pos = trans.getOrigin();
+	float x = pos.getX(); 
+	float y = pos.getY(); 
+	float z = pos.getZ(); */
+
+	btTransform trans = collider->getWorldTransform(); 
+	//collider->getMotionState()->getWorldTransform(trans); 
+
+	btVector3 newPos = trans.getOrigin(); 
+	float x = newPos.getX(); 
+	float y = newPos.getY(); 
+	float z = newPos.getZ(); 
+	//move(XMFLOAT4(x,y,z, 1.0f)); 
+
+	
+	/*btMatrix3x3 matrix = trans.getBasis();
+	btVector3 rowOne = matrix.getRow(0); 
+	btVector3 rowTwo = matrix.getRow(1);
+	btVector3 rowThree = matrix.getRow(2);
+	XMFLOAT4X4 mat = XMFLOAT4X4(
+		1, 0, 0 ,rowOne.getX(),
+		0, 1, 0, rowTwo.getY(),
+		0, 0, 1, rowThree.getZ(),
+		0, 0, 0, 1.0f
+		);
+	XMMATRIX translation = XMLoadFloat4x4(&mat); */
+	
 	
 	
 	//Update world matrix by multiplying matrices 
 	//Load Matrices for operations
-	XMMATRIX worldMat = XMLoadFloat4x4(&worldMatrix); 
+	XMMATRIX worldMat = XMLoadFloat4x4(&worldMatrix);
 	XMMATRIX translation = XMLoadFloat4x4(&position);
 	XMMATRIX rot = XMLoadFloat4x4(&rotation);
 	XMMATRIX scaling = XMLoadFloat4x4(&scalar);
 
-	worldMat = translation * rot * scaling; 
-	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(worldMat)); 
-
+	worldMat = translation * rot * scaling;
+	
+	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(worldMat));
+	
+	//btTransform t= collider->getWorldTransform();
+	//trans.setIdentity();
+	//trans.setOrigin(btVector3(position._14, position._24, position._34));
+	//t.setOrigin(btVector3(position._41, position._42, position._43));
 }
 
 void Entity::drawScene(ID3D11DeviceContext * deviceContext)
@@ -121,36 +265,52 @@ void Entity::move(XMFLOAT4 force)
 {
 	//Would doing something like this be more optimized?
 	/*position = XMFLOAT4X4(
-		position._11 += force.x, position._12, position._13, position._14,
-		position._21, position._22 += force.y, position._23, position._24,
-		position._31, position._32, position._33 += force.z, position._34,
-		position._41, position._42, position._43, position._44 += force.w); */
+	position._11 += force.x, position._12, position._13, position._14,
+	position._21, position._22 += force.y, position._23, position._24,
+	position._31, position._32, position._33 += force.z, position._34,
+	position._41, position._42, position._43, position._44 += force.w); */
 
-	XMMATRIX matrix = XMLoadFloat4x4(&position); 
+	XMMATRIX matrix = XMLoadFloat4x4(&position);
 
-	matrix *= XMMatrixTranslation(force.x, force.y, force.z); 
+	matrix *= XMMatrixTranslation(force.x, force.y, force.z);
 
-	XMStoreFloat4x4(&position, matrix); 
+	XMStoreFloat4x4(&position, matrix);
 
 
+	CopyTransformToBullet(); 
+	// add back to physics 
+	/*btTransform trans = collider->getWorldTransform();
+	XMFLOAT4X4 currentPos = getPosition(); 
+	float x = currentPos._11;
+	float y = currentPos._22;
+	float z = currentPos._33;
+	XMFLOAT4X4 currentRot = getRotation();
+	float xRot = currentRot._11;
+	float yRot = currentRot._22;
+	float zRot = currentRot._33;
+	float w = currentRot._44;
+	trans.setIdentity();
+	trans.setOrigin(btVector3(x , y, z));
+	trans.setRotation(btQuaternion(xRot,yRot,zRot,w));
+	collider->setWorldTransform(trans);*/
 }
 
 void Entity::scale(XMFLOAT4 nscalar)
 {
 	//Would doing something like this be more optimized?
 	/*scalar = XMFLOAT4X4(
-		scalar._11 , scalar._12, scalar._13, nscalar.x,
-		scalar._21, scalar._22, position._23, nscalar.y,
-		scalar._31, scalar._32, scalar._33, nscalar.z,
-		scalar._41, scalar._42, scalar._43, scalar._44 * 1);*/
+	scalar._11 , scalar._12, scalar._13, nscalar.x,
+	scalar._21, scalar._22, position._23, nscalar.y,
+	scalar._31, scalar._32, scalar._33, nscalar.z,
+	scalar._41, scalar._42, scalar._43, scalar._44 * 1);*/
 
 	XMMATRIX matrix = XMLoadFloat4x4(&scalar);
 
-	matrix *=  XMMatrixScaling(nscalar.x, nscalar.y, nscalar.z);
+	matrix *= XMMatrixScaling(nscalar.x, nscalar.y, nscalar.z);
 
 	XMStoreFloat4x4(&scalar, matrix);
 
-	
+
 }
 
 void Entity::rotate(XMFLOAT4 axis, float angle)
@@ -158,15 +318,15 @@ void Entity::rotate(XMFLOAT4 axis, float angle)
 
 	//Would doing something like this be more optimized?
 	/*rotation = XMFLOAT4X4(
-		rotation._11 + nrotation.x, rotation._12, rotation._13, rotation._14,
-		rotation._21, rotation._22 + nrotation.y, rotation._23, rotation._24,
-		rotation._31, rotation._32, rotation._33 + nrotation.z, rotation._34,
-		rotation._41, rotation._42, rotation._43, rotation._44 + nrotation.w);*/
+	rotation._11 + nrotation.x, rotation._12, rotation._13, rotation._14,
+	rotation._21, rotation._22 + nrotation.y, rotation._23, rotation._24,
+	rotation._31, rotation._32, rotation._33 + nrotation.z, rotation._34,
+	rotation._41, rotation._42, rotation._43, rotation._44 + nrotation.w);*/
 
-	XMMATRIX matrix = XMLoadFloat4x4(&rotation); 
-	XMVECTOR rotAxis = XMLoadFloat4(&axis); 
+	XMMATRIX matrix = XMLoadFloat4x4(&rotation);
+	XMVECTOR rotAxis = XMLoadFloat4(&axis);
 
-	matrix *= XMMatrixRotationAxis(rotAxis, angle); 
+	matrix *= XMMatrixRotationAxis(rotAxis, angle);
 
 	XMStoreFloat4x4(&rotation, matrix);
 
@@ -175,11 +335,11 @@ void Entity::rotate(XMFLOAT4 axis, float angle)
 void Entity::prepareMaterial(XMFLOAT4X4 view, XMFLOAT4X4 proj)
 {
 	//Prepares material object for reuse 
-	material->vertexShader->SetMatrix4x4("world", worldMatrix); 
-	material->vertexShader->SetMatrix4x4("view", view); 
-	material->vertexShader->SetMatrix4x4("projection", proj); 
-	material->vertexShader->SetShader(true); 
-	material->pixelShader->SetShader(true); 
+	material->vertexShader->SetMatrix4x4("world", worldMatrix);
+	material->vertexShader->SetMatrix4x4("view", view);
+	material->vertexShader->SetMatrix4x4("projection", proj);
+	material->vertexShader->SetShader(true);
+	material->pixelShader->SetShader(true);
 	material->pixelShader->SetShaderResourceView("diffuseTexture", material->SRV);
 	material->pixelShader->SetSamplerState("trillinear", material->samplerState);
 }

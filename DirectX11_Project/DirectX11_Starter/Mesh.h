@@ -7,15 +7,18 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include "btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
+#include "BulletCollision\Gimpact\btGImpactCollisionAlgorithm.h"
 
 #if defined(DEBUG) || defined(_DEBUG)
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #endif
 
-using namespace std; 
+using namespace std;
 
-class Mesh 
+class Mesh
 {
 public:
 	Mesh();
@@ -25,13 +28,14 @@ public:
 	ID3D11Buffer* GetVertexBuffer();
 	ID3D11Buffer* GetIndexBuffer();
 	int GetIndexCount();
-
-
-private: 
-	ID3D11Buffer* vertexBuffer; 
+	vector<btVector3> points;
+	btTriangleMesh* tempMesh;
+	btGImpactMeshShape* triMesh;
+private:
+	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
-	int indexCount; 
-	
+	int indexCount;
+
 
 };
 

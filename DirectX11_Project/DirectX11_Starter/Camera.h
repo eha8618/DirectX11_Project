@@ -28,6 +28,7 @@ public:
 	void moveVertically(float displacement); 
 	void strafe(float displacement); 
 	void turn(float dx, float dy);
+	void follow(XMFLOAT3 target); 
 	float restrictAngle(float angle); 
 
 	// Getters and Setters 

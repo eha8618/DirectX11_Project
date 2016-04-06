@@ -5,7 +5,7 @@
 Camera::Camera()
 {
 	//initialize attributes
-	position = XMFLOAT3(0.0f, -3.0f, -5.0f); 
+	position = XMFLOAT3(0.0f, 3.0f, -10.0f); 
 	direction = XMFLOAT3(0.0f, 0.0f, 1.0f); 
 	left = XMFLOAT3(0.0f, 0.0f, 0.0f); 
 	up = XMFLOAT3(0.0f, 1.0f, 0.0f); 
@@ -89,6 +89,13 @@ void Camera::cameraInput(float deltaTime)
 	}
 
 
+}
+
+void Camera::follow(XMFLOAT3 target)
+{
+	//XMVECTOR
+
+	//direction = target; 
 }
 
 void Camera::rotate(float amt)
@@ -188,6 +195,8 @@ XMFLOAT3 Camera::getPosition()
 {
 	return position;
 }
+
+
 
 void Camera::setProjectionMatrix(XMFLOAT4X4 newMat)
 {

@@ -7,6 +7,10 @@
 #include "Entity.h"
 #include "Camera.h"
 #include "Lights.h"
+#include "GamePadXbox.h"
+#include "btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
+#include "BulletCollision\Gimpact\btGImpactCollisionAlgorithm.h"
 
 
 // Include run-time memory checking in debug builds, so 
@@ -19,6 +23,7 @@
 // --------------------------------------------------------
 // Game class which extends the base DirectXGameCore class
 // --------------------------------------------------------
+
 class MyDemoGame : public DirectXGameCore
 {
 public:
@@ -36,11 +41,27 @@ public:
 	void OnMouseUp(WPARAM btnState, int x, int y);
 	void OnMouseMove(WPARAM btnState, int x, int y);
 
+
+
+	//Physics 
+	static  btBroadphaseInterface* broadphase;
+
+	static btDefaultCollisionConfiguration* collisionConfiguration;
+	static btCollisionDispatcher* dispatcher;
+
+	static btSequentialImpulseConstraintSolver* solver;
+
+	static btDiscreteDynamicsWorld* dynamicsWorld;
+
+	void UpdatePhysics(float deltaTime); 
+
+
+
 private:
 	// Initialization for our "game" demo - Feel free to
 	// expand, alter, rename or remove these once you
 	// start doing something more advanced!
-	void LoadShaders(); 
+	void LoadShaders();
 	void CreateGeometry();
 	void CreateMatrices();
 
@@ -49,26 +70,31 @@ private:
 	Mesh* meshTwo;
 	Mesh* meshThree;
 
-	//Entities 
+	////Entities 
+
 	Entity* e1;
 	Entity* e2;
 	Entity* e3;
-	vector<Entity*> entities; 
+	vector<Entity*> entities;
 
 	//Camera
-	Camera* cam; 
+	Camera* cam;
+
+	//Xbox Controller Input 
+	GamePadXbox* pad; 
+
 
 	//Material 
-	Material* material; 
+	Material* material;
 
 	//Lights
-	DirectionalLight directionalLight; 
+	DirectionalLight directionalLight;
 	DirectionalLight directionalLight2;
-	SpecularLight specularLight; 
-	PointLight pointLight; 
+	SpecularLight specularLight;
+	PointLight pointLight;
 
 	//Misc
-	bool leftmouseHeld; 
+	bool leftmouseHeld;
 	bool middlemouseHeld;
 	bool rightmouseHeld;
 

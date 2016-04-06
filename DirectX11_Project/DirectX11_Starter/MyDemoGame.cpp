@@ -23,9 +23,28 @@
 
 #include "MyDemoGame.h"
 #include "Vertex.h"
+#include "btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
+#include "BulletCollision\Gimpact\btGImpactCollisionAlgorithm.h"
+//#include "Entity.h"
 
 // For the DirectX Math library
 using namespace DirectX;
+
+
+
+btBroadphaseInterface* MyDemoGame::broadphase = nullptr;
+
+btDefaultCollisionConfiguration* MyDemoGame::collisionConfiguration = nullptr;
+btCollisionDispatcher* MyDemoGame::dispatcher = nullptr;
+
+btSequentialImpulseConstraintSolver* MyDemoGame::solver = nullptr;
+
+btDiscreteDynamicsWorld* MyDemoGame::dynamicsWorld = nullptr;
+
+
+
+
 
 
 #pragma region Win32 Entry Point (WinMain)
@@ -84,11 +103,29 @@ MyDemoGame::MyDemoGame(HINSTANCE hInstance)
 	e2 = nullptr;
 	e3 = nullptr;
 
-	cam = new Camera(); 
+	cam = new Camera();
 
-	leftmouseHeld = false; 
-	middlemouseHeld = false; 
-	rightmouseHeld = false; 
+	leftmouseHeld = false;
+	middlemouseHeld = false;
+	rightmouseHeld = false;
+
+	//Input 
+	pad = new GamePadXbox(GamePadIndex_One); 
+
+	//Physics Initialization  
+	
+
+	collisionConfiguration = new btDefaultCollisionConfiguration();
+	dispatcher = new btCollisionDispatcher(collisionConfiguration);
+	broadphase = new btDbvtBroadphase();
+	solver = new btSequentialImpulseConstraintSolver();
+	
+	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+	dynamicsWorld->setGravity(btVector3(0.0f, -9.81f, 0.0f));
+	//dynamicsWorld->performDiscreteCollisionDetection(); 
+
+	
+	
 }
 
 // --------------------------------------------------------
@@ -114,14 +151,28 @@ MyDemoGame::~MyDemoGame()
 	//Delete Entities
 	for (unsigned int i = 0; i < entities.size(); i++)
 	{
+		MyDemoGame::dynamicsWorld->removeRigidBody(entities[i]->collider);
+		entities[i] = nullptr; 
 		delete entities[i];
 	}
+
+	// Delete Physics World
+	delete MyDemoGame::solver;
+	delete MyDemoGame::collisionConfiguration;
+	delete MyDemoGame::dispatcher;
+	delete MyDemoGame::broadphase;
+	delete MyDemoGame::dynamicsWorld;
 	
+
+
 	//Delete Material
 	delete material;
 
 	//Delete Camera
-	delete cam; 
+	delete cam;
+
+	//Delete Game Pad
+	delete pad; 
 }
 
 #pragma endregion
@@ -171,21 +222,21 @@ bool MyDemoGame::Init()
 		&directionalLight2,	// address in memory
 		sizeof(DirectionalLight)); // size of data to copy 
 
-	// Point Lights 
-	pointLight.PointLightColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.0f); 
-	pointLight.Position = XMFLOAT3(0.0f, 1.0f, -3.0f); 
+								   // Point Lights 
+	pointLight.PointLightColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.0f);
+	pointLight.Position = XMFLOAT3(0.0f, 1.0f, -3.0f);
 	pixelShader->SetData(
 		"pointLight",	//name in shader variable
 		&pointLight,	// address in memory
 		sizeof(PointLight)); // size of data to copy 
 
-	// Store Camera for for specular lighting 
-	pixelShader->SetData("camPos", &cam->getPosition(), sizeof(XMFLOAT3)); 
+							 // Store Camera for for specular lighting 
+	pixelShader->SetData("camPos", &cam->getPosition(), sizeof(XMFLOAT3));
 
 	// Specular Lights 
-	specularLight.SpecularColor = XMFLOAT4(1.0f, 0.1449275f, 0.0f, 1.0f); 
+	specularLight.SpecularColor = XMFLOAT4(1.0f, 0.1449275f, 0.0f, 1.0f);
 	specularLight.Direction = XMFLOAT3(1.0f, -1.0f, -5.0f);
-	specularLight.SpecularStrength = 0.75f; 
+	specularLight.SpecularStrength = 0.75f;
 	specularLight.LightIntensity = 0.5f;
 	pixelShader->SetData(
 		"specularLight",	//name in shader variable
@@ -193,10 +244,50 @@ bool MyDemoGame::Init()
 		sizeof(SpecularLight)); // size of data to copy 
 
 
-	// Successfully initialized
+								// Successfully initialized
 	return true;
 }
 
+
+void MyDemoGame::UpdatePhysics(float deltaTime)
+{
+
+	
+	// Update Physics 
+	
+	MyDemoGame::dynamicsWorld->stepSimulation(deltaTime, 10);
+
+	for (int i = 0; i < entities.size(); i++)
+	{
+		entities[i]->CopyTransformFromBullet(); 
+	}
+
+	// Check Ball 
+	btTransform trans;
+	entities[1]->motionState->getWorldTransform(trans);
+
+	//cout << "Sphere height: " << trans.getOrigin().getY() << endl; 
+	
+
+	
+
+	/*int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds(); 
+	if (numManifolds > 0)
+	{
+		entities[1]->collider->activate(true); 
+		entities[1]->collider->applyForce(btVector3(0, -20.0f, 0), btVector3(0,0,0)); 
+	}*/
+		
+	// Check for Collisions 
+	//entities[1]->collider->activate(true); 
+	//entities[1]->collider->applyCentralImpulse(btVector3(0.f, 0.f, -0.005f)); 
+	/*btVector3 floorPos = entities[0]->collider->getCenterOfMassPosition(); 
+	if (entities[1]->collider->getCenterOfMassPosition().dot(floorPos) < 0.25f)
+	{
+		entities[1]->collider->activate(true);
+		entities[1]->collider->applyCentralImpulse(btVector3(0.f, 20.f, 0.0f));
+	}*/
+}
 
 // --------------------------------------------------------
 // Loads shaders from compiled shader object (.cso) files
@@ -219,8 +310,8 @@ void MyDemoGame::LoadShaders()
 void MyDemoGame::CreateGeometry()
 {
 	//	Generic UVs
-	XMFLOAT3 normal = XMFLOAT3(0, 0, -1); 
-	XMFLOAT2 uv = XMFLOAT2(0, 0); 
+	XMFLOAT3 normal = XMFLOAT3(0, 0, -1);
+	XMFLOAT2 uv = XMFLOAT2(0, 0);
 
 	// Create some temporary variables to represent colors
 	// - Not necessary, just makes things more readable
@@ -247,20 +338,20 @@ void MyDemoGame::CreateGeometry()
 
 
 	//meshOne = new Mesh(vertices, (int)sizeof(vertices), indices, sizeof(indices), device);
-	meshOne = new Mesh("Models/flatsurface.obj", device); 
+	meshOne = new Mesh("Models/cube.obj", device);
 
 
 	//Create second Mesh
 	Vertex triVerts[] =
 	{
-		{XMFLOAT3(+0.0f, +2.0f, +0.0f), normal, uv},
-		{ XMFLOAT3(+2.5f, -0.0f, +0.0f), normal, uv},
-		{ XMFLOAT3(-0.5f, -0.0f, +0.0f), normal, uv},
+		{ XMFLOAT3(+0.0f, +2.0f, +0.0f), normal, uv },
+		{ XMFLOAT3(+2.5f, -0.0f, +0.0f), normal, uv },
+		{ XMFLOAT3(-0.5f, -0.0f, +0.0f), normal, uv },
 	};
 	unsigned int triIndices[] = { 0, 1, 2 };
 
 	//meshTwo = new Mesh(triVerts, (int)sizeof(triVerts), triIndices, sizeof(triIndices), device);
-	meshTwo = new Mesh("Models/cube.obj", device); 
+	meshTwo = new Mesh("Models/sphere.obj", device);
 
 	//Create third Mesh 
 
@@ -273,23 +364,69 @@ void MyDemoGame::CreateGeometry()
 	unsigned int triTwoIndices[] = { 0 , 1, 2 };
 
 	//meshThree = new Mesh(triTwoVerts, (int)sizeof(triTwoVerts), triTwoIndices, sizeof(triTwoIndices), device);
-	meshThree = new Mesh("Models/cube.obj", device); 
+	meshThree = new Mesh("Models/cube.obj", device);
+
+
+	// Setup Physics
+	// Collision Shapes 
+	//btCollisionShape* shape1 = meshOne->triMesh; //cube
+	//btCollisionShape* shape2 = meshTwo->triMesh; //sphere 
+	/*btCollisionShape* shape1 = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
+	btCollisionShape* shape2 = new btSphereShape(1); */
+	btStaticPlaneShape* shape1 = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
+	btSphereShape* shape2 = new btSphereShape(1);
+
+
+	/*btTransform t; 
+	t.setIdentity(); 
+	t.setOrigin(btVector3(0, 0, 0)); */
+
+	// Motion States and Rigid Bodies for collision shapes
+	btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0.0f, 0)));
+	btRigidBody::btRigidBodyConstructionInfo
+		groundRigidBodyCI(0, groundMotionState, shape1, btVector3(0.0f, 0.0f, 0.0f));
+	btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
+
+	dynamicsWorld->addRigidBody(groundRigidBody); 
+	 
+	 
+
+
+	btDefaultMotionState* fallMotionState =
+		new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 200.0f, 0.0f)));
+	btScalar mass = 1;
+	btVector3 fallInertia(0.0f, 0.0f, 0.0f);
+	shape2->calculateLocalInertia(mass, fallInertia);
+	btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, shape2, fallInertia);
+	btRigidBody* fallRigidBody = new btRigidBody(fallRigidBodyCI);
+	 
+	dynamicsWorld->addRigidBody(fallRigidBody); 
+	
+
+
 
 	//Create Material 
-	material = new Material(vertexShader, pixelShader, device, deviceContext, L"Textures/rust.jpg"); 
+	material = new Material(vertexShader, pixelShader, device, deviceContext, L"Textures/rust.jpg");
 	//Create entities 
-	e1 = new Entity(meshOne, material);
-	e2 = new Entity(meshThree, material);
-	e3 = new Entity(meshTwo, material);
+	e1 = new Entity(meshOne, material, shape1, groundMotionState, groundRigidBody);
+	e2 = new Entity(meshTwo, material, shape2, fallMotionState, fallRigidBody);
+	//e3 = new Entity(meshTwo, material);
+	
+
+
+	//e2->move(XMFLOAT4(0, 5, 0, 0)); 
+	//e2->move(XMFLOAT4(0, 10, 0, 0)); 
+	//e1->move(XMFLOAT4(0, -7.5f, 2.0f ,0 ));
+	//e1->scale(XMFLOAT4(7.0f, 0.52f, 7.0f, 1.0f));
+	//e2->move(XMFLOAT4(0, 10.0f, 13.5f, 0));
 	//organize entities in vector
 	entities.push_back(e1);
 	entities.push_back(e2);
-	entities.push_back(e3);
-	
-	//set pos of track 
-	entities[0]->move(XMFLOAT4(1.0f, -3.0f, 1.0f, 1.0f)); 
-	entities[0]->scale(XMFLOAT4(1.0f, 1.5f, 1.0f, 1.0f)); 
-	
+	//entities.push_back(e3);
+	//dynamicsWorld->addRigidBody(entities[0]->collider);
+	//dynamicsWorld->addRigidBody(entities[1]->collider);
+
+
 }
 
 
@@ -305,13 +442,13 @@ void MyDemoGame::CreateMatrices()
 	XMMATRIX W = XMMatrixIdentity();
 	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(W)); // Transpose for HLSL!
 
-	// Create the View matrix
-	// - In an actual game, recreate this matrix when the camera 
-	//    moves (potentially every frame)
-	// - We're using the LOOK TO function, which takes the position of the
-	//    camera and the direction you want it to look (as well as "up")
-	// - Another option is the LOOK AT function, to look towards a specific
-	//    point in 3D space
+														 // Create the View matrix
+														 // - In an actual game, recreate this matrix when the camera 
+														 //    moves (potentially every frame)
+														 // - We're using the LOOK TO function, which takes the position of the
+														 //    camera and the direction you want it to look (as well as "up")
+														 // - Another option is the LOOK AT function, to look towards a specific
+														 //    point in 3D space
 	XMVECTOR pos = XMVectorSet(0, 0, -5, 0);
 	XMVECTOR dir = XMVectorSet(0, 0, 1, 0);
 	XMVECTOR up = XMVectorSet(0, 1, 0, 0);
@@ -321,9 +458,9 @@ void MyDemoGame::CreateMatrices()
 		up);     // "Up" direction in 3D space (prevents roll)
 	XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V)); // Transpose for HLSL!
 
-	// Create the Projection matrix
-	// - This should match the window's aspect ratio, and also update anytime
-	//   the window resizes (which is already happening in OnResize() below)
+														// Create the Projection matrix
+														// - This should match the window's aspect ratio, and also update anytime
+														//   the window resizes (which is already happening in OnResize() below)
 	XMMATRIX P = XMMatrixPerspectiveFovLH(
 		0.25f * 3.1415926535f,		// Field of View Angle
 		aspectRatio,				// Aspect ratio
@@ -345,7 +482,7 @@ void MyDemoGame::OnResize()
 	// Handle base-level DX resize stuff
 	DirectXGameCore::OnResize();
 
-	cam->onResize(aspectRatio); 
+	cam->onResize(aspectRatio);
 }
 #pragma endregion
 
@@ -357,34 +494,70 @@ void MyDemoGame::OnResize()
 float x = 0;
 void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 {
+	//Physics 
+	UpdatePhysics(deltaTime); 
+	
+
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
-	
+
 
 	//constants that control movement  
-	float speed = 0.25f * deltaTime;
+	float speed = 0.0025f * deltaTime;
 	float rotation = 0.55f * deltaTime;
-	float buffer = 1.5f; 
+	float buffer = 1.5f;
 	//update entities
-	for (unsigned int i = 0; i < entities.size(); i++)
-	{
-		//rotate all entities 
-		//entities[i]->rotate(XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f), rotation);
-	}
+
+
+
+	//Input --------------------------------------------
 
 	//Check if mouse held
+	//if (leftmouseHeld) { entities[0]->move(XMFLOAT4(speed, 0.f, 0.0f, 0.0f)); }
+	//if (middlemouseHeld) { entities[1]->collider->applyCentralImpulse(btVector3(0.0f, 200.0f, 0.0f)); }
+	pad->State.reset();
+	 if (rightmouseHeld) 
+	 { 
+		 entities[1]->collider->applyImpulse(btVector3(0.0f, 50.0f, 0.0f), btVector3(0,0,0));  
+		 rightmouseHeld = false; 
+	 }
 	
 
-	//update all entities 
-	for (unsigned int i = 0; i < entities.size(); ++i)
+
+	//Check if there is a game pad 
+	 else if (pad->is_connected())
+	 {
+		 //Controller input is run a bunch of time because of FPS 
+		 //Check state of Game Pad
+		 pad->update();
+		 //Quit with back button 
+		 if (pad->State._buttons[GamePad_Button_BACK] == true)
+		 {
+			 Quit(); 
+		 }
+		 //Bounce Ball with A 
+		 else if (pad->State._buttons[GamePad_Button_A] == true)
+		 {
+			 //Make value small because of FPS 
+			 entities[1]->collider->applyImpulse(btVector3(0.0f, 0.1f, 0.0f), btVector3(0, 0, 0));
+		 }
+		 
+		 
+	 }
+
+	 
+
+
+	//Update all entities in the world
+	for (unsigned int i = 0; i < entities.size(); i++)
 	{
 		entities[i]->updateScene();
 	}
 
-	
+
 	//update Camera and it's input
-	cam->cameraInput(deltaTime); 
+	cam->cameraInput(deltaTime);
 	cam->update(deltaTime);
 }
 
@@ -416,18 +589,27 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
 	vertexShader->SetShader(true);
 	pixelShader->SetShader(true);
 	//for (int i = 0; i < entities.size(); i++)
-	for (int i = 0; i < 1; i++)
+	for (unsigned int i = 0; i < entities.size(); i++)
 	{
 		// Send data to shader variables
 		//  - Do this ONCE PER OBJECT you're drawing
 		//  - This is actually a complex process of copying data to a local buffer
 		//    and then copying that entire buffer to the GPU.  
 		//  - The "SimpleShader" class handles all of that for you.
-		entities[i]->prepareMaterial(cam->getViewMatrix(), cam->getProjectionMatrix()); 
+		//XMFLOAT4X4 wm = entities[i]->getWorldMatrix();
+		//vertexShader->SetMatrix4x4("world", wm);
+		//vertexShader->CopyAllBufferData();
+		////draw here 
+		//entities[i]->drawScene(deviceContext);
+		////vertexShader->SetMatrix4x4("view", viewMatrix);
+		//vertexShader->SetMatrix4x4("view", cam->getViewMatrix());
+		//vertexShader->SetMatrix4x4("projection", cam->getProjectionMatrix());
+
+		entities[i]->prepareMaterial(cam->getViewMatrix(), cam->getProjectionMatrix());
 		//draw here 
 		entities[i]->drawScene(deviceContext);
 	}
-	
+
 
 
 	// Present the buffer
@@ -453,12 +635,15 @@ void MyDemoGame::OnMouseDown(WPARAM btnState, int x, int y)
 	// Save the previous mouse position, so we have it for the future
 	prevMousePos.x = x;
 	prevMousePos.y = y;
-
+	cout << "Mouse down" << endl; 
 	//mouse input
-	if (btnState & 0x0001) { /* Left button is down */ leftmouseHeld = true; } else { leftmouseHeld = false;  }
-	if (btnState & 0x0002) { /* Right button is down */ rightmouseHeld = true; } else { rightmouseHeld = false; }
-	if (btnState & 0x0010) { /* Middle button is down */ middlemouseHeld = true; } else { middlemouseHeld = false; }
-	
+	if (btnState & 0x0001) { /* Left button is down */ leftmouseHeld = true; }
+
+	if (btnState & 0x0002) { /* Right button is down */ rightmouseHeld = true; }
+
+	if (btnState & 0x0010) { /* Middle button is down */ middlemouseHeld = true; }
+
+
 
 
 	// Caputure the mouse so we keep getting mouse move
@@ -476,6 +661,15 @@ void MyDemoGame::OnMouseUp(WPARAM btnState, int x, int y)
 {
 	// We don't care about the tracking the cursor outside
 	// the window anymore (we're not dragging if the mouse is up)
+	cout << "Mouse up" << endl;
+
+	if (btnState & 0x0001) { /* Left button is down */ leftmouseHeld = false; }
+
+	if (btnState & 0x0002) { /* Right button is down */ rightmouseHeld = false; }
+
+	if (btnState & 0x0010) { /* Middle button is down */ middlemouseHeld = false; }
+
+
 	ReleaseCapture();
 }
 
@@ -489,13 +683,13 @@ void MyDemoGame::OnMouseUp(WPARAM btnState, int x, int y)
 void MyDemoGame::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	//calc Cam coords
-	float camX = x - (float)prevMousePos.x;
-	float camY = y - (float)prevMousePos.y;
+	float camX = x - prevMousePos.x;
+	float camY = y - prevMousePos.y;
 	// Save the previous mouse position, so we have it for the future
 	prevMousePos.x = x;
 	prevMousePos.y = y;
-	
 
-	cam->turn(camX, camY); 
+
+	cam->turn(camX, camY);
 }
 #pragma endregion

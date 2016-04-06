@@ -1,41 +1,54 @@
 #pragma once
 #include "Mesh.h"
 #include "Material.h"
+#include "btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
+#include "BulletCollision\Gimpact\btGImpactCollisionAlgorithm.h"
 
-using namespace DirectX; 
+
+using namespace DirectX;
 
 class Entity
 {
 public:
 	Entity();
 	~Entity();
-	Entity(Mesh* inputMeshm, Material* inputMaterial); 
+	Entity(Mesh* inputMeshm, Material* inputMaterial, btCollisionShape* colliderShape, btDefaultMotionState* mState, btRigidBody* colliderTemp);
 	//attributes 
 	Mesh* mesh;
-	Material* material; 
-	
+	Material* material;
+
 	//getters and setters
-	XMFLOAT4X4 getPosition(); 
+	XMFLOAT4X4 getPosition();
 	XMFLOAT4X4 getRotation();
 	XMFLOAT4X4 getScale();
 	XMFLOAT4X4 getWorldMatrix();
 
+	void setPosition(float x, float y, float z);
+	void setRotation(XMFLOAT4 newRot);
 	void setScale(XMFLOAT3 newScale);
 	void setWorldMatrix(XMFLOAT4X4 newWorldMatrix);
 
 	//Class Specific functions 
-	void updateScene(); 
+	void updateScene();
 	void drawScene(ID3D11DeviceContext* deviceContext);
-	void move(XMFLOAT4 force); 
-	void scale(XMFLOAT4 nscalar); 
-	void rotate(XMFLOAT4 axis, float angle); 
-	void prepareMaterial(XMFLOAT4X4 view, XMFLOAT4X4 proj); 
+	void move(XMFLOAT4 force);
+	void scale(XMFLOAT4 nscalar);
+	void rotate(XMFLOAT4 axis, float angle);
+	void prepareMaterial(XMFLOAT4X4 view, XMFLOAT4X4 proj);
+	void CopyTransformFromBullet(); 
+	void CopyTransformToBullet(); 
+
+	btCollisionShape* collisionShape;
+	btRigidBody* collider;
+	btDefaultMotionState* motionState;
 private:
 	XMFLOAT4X4 position;
 	XMFLOAT4X4 rotation;
 	XMFLOAT4X4 scalar;
 	XMFLOAT4X4 worldMatrix;
-	
+
+
 
 };
 

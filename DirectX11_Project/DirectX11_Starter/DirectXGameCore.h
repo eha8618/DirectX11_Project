@@ -14,9 +14,10 @@
 #include "Windows.h"
 #include <string>
 #include <d3d11.h>
+#include <iostream>
 
 #include "dxerr.h"
-
+using namespace std; 
 // --------------------------------------------------------
 // Convenience macro for releasing COM objects.
 //
