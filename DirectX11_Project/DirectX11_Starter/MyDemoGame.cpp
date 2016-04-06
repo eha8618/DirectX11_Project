@@ -113,8 +113,6 @@ MyDemoGame::MyDemoGame(HINSTANCE hInstance)
 	pad = new GamePadXbox(GamePadIndex_One); 
 
 	//Physics Initialization  
-	
-
 	collisionConfiguration = new btDefaultCollisionConfiguration();
 	dispatcher = new btCollisionDispatcher(collisionConfiguration);
 	broadphase = new btDbvtBroadphase();
@@ -163,7 +161,8 @@ MyDemoGame::~MyDemoGame()
 	delete MyDemoGame::broadphase;
 	delete MyDemoGame::dynamicsWorld;
 	
-
+	//Delete HUD
+	delete UI; 
 
 	//Delete Material
 	delete material;
@@ -426,6 +425,7 @@ void MyDemoGame::CreateGeometry()
 	//dynamicsWorld->addRigidBody(entities[0]->collider);
 	//dynamicsWorld->addRigidBody(entities[1]->collider);
 
+	//Create UI 
 
 }
 

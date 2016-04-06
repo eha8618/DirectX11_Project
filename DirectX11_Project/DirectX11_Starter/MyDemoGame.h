@@ -8,9 +8,11 @@
 #include "Camera.h"
 #include "Lights.h"
 #include "GamePadXbox.h"
+#include "HUD.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision\Gimpact\btGImpactCollisionAlgorithm.h"
+
 
 
 // Include run-time memory checking in debug builds, so 
@@ -83,6 +85,8 @@ private:
 	//Xbox Controller Input 
 	GamePadXbox* pad; 
 
+	//HUD
+	HUD* UI; 
 
 	//Material 
 	Material* material;
