@@ -363,7 +363,7 @@ void MyDemoGame::CreateGeometry()
 	unsigned int triTwoIndices[] = { 0 , 1, 2 };
 
 	//meshThree = new Mesh(triTwoVerts, (int)sizeof(triTwoVerts), triTwoIndices, sizeof(triTwoIndices), device);
-	meshThree = new Mesh("Models/cube.obj", device);
+	meshThree = new Mesh("Models/flatsurface.obj", device);
 
 
 	// Setup Physics
@@ -400,17 +400,52 @@ void MyDemoGame::CreateGeometry()
 	btRigidBody* fallRigidBody = new btRigidBody(fallRigidBodyCI);
 	 
 	dynamicsWorld->addRigidBody(fallRigidBody); 
+
+
+
+	// BULLET VEHICLE -- reference to vehicle demo, and user ainurakne for a wheel problem -------------------------------------------------------------
+
+	// make chassis with a collision shape and a rigid body, also added to dynamic world
+	btScalar chassisMass(1.0f);
+	btVector3 chassisInertia(0.0f, 0.0f, 0.0f);
+	btCollisionShape* chassisShape = new btBoxShape(btVector3(1.0f, .5f, 2.0f));
+
+	btDefaultMotionState* chassisMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, 5.0f, 0.0f)));
+	chassisShape->calculateLocalInertia(chassisMass, chassisInertia);
+
+	btRigidBody::btRigidBodyConstructionInfo chassisRBCI(chassisMass, chassisMotionState, chassisShape, chassisInertia);
+	btRigidBody* chassisRB = new btRigidBody(chassisRBCI);
+	chassisRB->setActivationState(DISABLE_DEACTIVATION);
+	dynamicsWorld->addRigidBody(chassisRB);
+
+	// setting raycasting for wheels and making vehicle
+	btRaycastVehicle::btVehicleTuning tune;
+	btVehicleRaycaster* caster = new btDefaultVehicleRaycaster(dynamicsWorld);
+	btRaycastVehicle* vehicle = new btRaycastVehicle(tune, chassisRB, caster);
+	vehicle->setCoordinateSystem(0, 1, 2);
+
+	// make wheels, also keep them under the half-length of chassis
+	btVector3 wheelDir(0.0f, -1.0f, 0.0f);
+	btVector3 wheelAxis(-1.0f, 0.0f, 0.0f);
+	btScalar suspensionRestLength(0.6f);
+	btScalar wheelRad(0.7f);
+
+	vehicle->addWheel(btVector3(-.50f, -.30f, 1.0f), wheelDir, wheelAxis, suspensionRestLength, wheelRad, tune, true);
+	vehicle->addWheel(btVector3(.5f, -.30f, 1.0f), wheelDir, wheelAxis, suspensionRestLength, wheelRad, tune, true);
+	vehicle->addWheel(btVector3(-.5f, -.30f, -1.0f), wheelDir, wheelAxis, suspensionRestLength, wheelRad, tune, false);
+	vehicle->addWheel(btVector3(.5f, -.30f, -1.0f), wheelDir, wheelAxis, suspensionRestLength, wheelRad, tune, false);
+
+	dynamicsWorld->addAction(vehicle);
 	
 
-
+	// END VEHICLE -------------------------------------------------------------------------------------------------------------
 
 	//Create Material 
 	material = new Material(vertexShader, pixelShader, device, deviceContext, L"Textures/rust.jpg");
 	//Create entities 
-	e1 = new Entity(meshOne, material, shape1, groundMotionState, groundRigidBody);
+	e1 = new Entity(meshThree, material, shape1, groundMotionState, groundRigidBody);
 	e2 = new Entity(meshTwo, material, shape2, fallMotionState, fallRigidBody);
-	//e3 = new Entity(meshTwo, material);
-	
+	e3 = new Entity(meshOne, material, chassisShape, chassisMotionState, chassisRB);
 
 
 	//e2->move(XMFLOAT4(0, 5, 0, 0)); 
@@ -421,6 +456,7 @@ void MyDemoGame::CreateGeometry()
 	//organize entities in vector
 	entities.push_back(e1);
 	entities.push_back(e2);
+	entities.push_back(e3);
 	//entities.push_back(e3);
 	//dynamicsWorld->addRigidBody(entities[0]->collider);
 	//dynamicsWorld->addRigidBody(entities[1]->collider);

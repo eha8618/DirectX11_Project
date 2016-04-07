@@ -1,39 +1,13 @@
-﻿Build started 4/6/2016 4:24:19 PM.
-     1>Project "\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\DirectX11_Starter.vcxproj" on node 2 (Build target(s)).
-     1>FxCompile:
-         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\fxc.exe /nologo /E"main" /T ps_5_0 /Fo "\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\Debug\PixelShader.cso" /Od /Zi Shaders\PixelShader.hlsl 
-     1>\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Shaders\PixelShader.hlsl(72,9-54): warning X3206: implicit truncation of vector type
-     1>\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Shaders\PixelShader.hlsl(73,2-29): warning X3206: implicit truncation of vector type
-     1>\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Shaders\PixelShader.hlsl(82,2-38): warning X3206: implicit truncation of vector type
-     1>\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Shaders\PixelShader.hlsl(118,8-67): warning X3206: implicit truncation of vector type
-     1>\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Shaders\PixelShader.hlsl(119,8-52): warning X3206: implicit truncation of vector type
-     1>\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Shaders\PixelShader.hlsl(124,2): warning X3206: implicit truncation of vector type
-         
-         compilation object save succeeded; see \\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\Debug\PixelShader.cso
-         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\fxc.exe /nologo /E"main" /T vs_5_0 /Fo "\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\Debug\VertexShader.cso" /Od /Zi Shaders\VertexShader.hlsl 
-         compilation object save succeeded; see \\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\Debug\VertexShader.cso
-       ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /I\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\packages\directxtk_desktop_2015.2016.2.23.1\build\native\../../build/native/include/ /I\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\\Bullet\src /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D HAS_DIRECTXTK /D _CRT_SECURE_NO_WARNINGS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt Camera.cpp Entity.cpp GamePadXbox.cpp HUD.cpp Material.cpp Mesh.cpp MyDemoGame.cpp dxerr.cpp DirectXGameCore.cpp SimpleShader.cpp Vehicle.cpp
-         Vehicle.cpp
-         SimpleShader.cpp
-         DirectXGameCore.cpp
-         dxerr.cpp
+﻿Build started 4/7/2016 4:26:17 AM.
+     1>Project "C:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\DirectX11_Starter.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /IC:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\packages\directxtk_desktop_2015.2016.2.23.1\build\native\../../build/native/include/ /IC:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\\Bullet\src /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D HAS_DIRECTXTK /D _CRT_SECURE_NO_WARNINGS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt MyDemoGame.cpp
          MyDemoGame.cpp
-     1>\\banner.main.ad.rit.edu\students\dxh8497\igmprofile\documents\directx11_project\directx11_project\directx11_starter\mydemogame.cpp(259): warning C4018: '<': signed/unsigned mismatch
-     1>\\banner.main.ad.rit.edu\students\dxh8497\igmprofile\documents\directx11_project\directx11_project\directx11_starter\mydemogame.cpp(686): warning C4244: 'initializing': conversion from 'LONG' to 'float', possible loss of data
-     1>\\banner.main.ad.rit.edu\students\dxh8497\igmprofile\documents\directx11_project\directx11_project\directx11_starter\mydemogame.cpp(687): warning C4244: 'initializing': conversion from 'LONG' to 'float', possible loss of data
-         Mesh.cpp
-     1>\\banner.main.ad.rit.edu\students\dxh8497\igmprofile\documents\directx11_project\directx11_project\directx11_starter\mesh.cpp(176): warning C4018: '<': signed/unsigned mismatch
-     1>\\banner.main.ad.rit.edu\students\dxh8497\igmprofile\documents\directx11_project\directx11_project\directx11_starter\mesh.cpp(184): warning C4018: '<': signed/unsigned mismatch
-     1>\\banner.main.ad.rit.edu\students\dxh8497\igmprofile\documents\directx11_project\directx11_project\directx11_starter\mesh.cpp(186): warning C4018: '<': signed/unsigned mismatch
-         Material.cpp
-         HUD.cpp
-         GamePadXbox.cpp
-         Entity.cpp
-         Camera.cpp
-         Generating Code...
+     1>c:\users\eddie\desktop\directx11_project\directx11_project\directx11_starter\mydemogame.cpp(259): warning C4018: '<': signed/unsigned mismatch
+     1>c:\users\eddie\desktop\directx11_project\directx11_project\directx11_starter\mydemogame.cpp(722): warning C4244: 'initializing': conversion from 'LONG' to 'float', possible loss of data
+     1>c:\users\eddie\desktop\directx11_project\directx11_project\directx11_starter\mydemogame.cpp(723): warning C4244: 'initializing': conversion from 'LONG' to 'float', possible loss of data
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\Debug\DirectX11_Starter.exe" /INCREMENTAL /NOLOGO \\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\packages\directxtk_desktop_2015.2016.2.23.1\build\native\../../build/native/lib/Win32/Debug/DirectXTKAudioDX.lib \\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\packages\directxtk_desktop_2015.2016.2.23.1\build\native\../../build/native/lib/Win32/Debug/DirectXTK.lib d3d11.lib d3dcompiler.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\Debug\DirectX11_Starter.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\Debug\DirectX11_Starter.lib" /MACHINE:X86 Debug\Camera.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\Debug\DirectX11_Starter.exe" /INCREMENTAL /NOLOGO C:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\packages\directxtk_desktop_2015.2016.2.23.1\build\native\../../build/native/lib/Win32/Debug/DirectXTKAudioDX.lib C:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\packages\directxtk_desktop_2015.2016.2.23.1\build\native\../../build/native/lib/Win32/Debug/DirectXTK.lib d3d11.lib d3dcompiler.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\Debug\DirectX11_Starter.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\Debug\DirectX11_Starter.lib" /MACHINE:X86 Debug\Camera.obj
          Debug\Entity.obj
          Debug\GamePadXbox.obj
          Debug\HUD.obj
@@ -44,12 +18,12 @@
          Debug\DirectXGameCore.obj
          Debug\SimpleShader.obj
          Debug\Vehicle.obj
-         \\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\lib\BulletCollision_vs2010_debug.lib
-         \\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\lib\BulletDynamics_vs2010_debug.lib
-         \\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\lib\LinearMath_vs2010_debug.lib
-         DirectX11_Starter.vcxproj -> \\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\Debug\DirectX11_Starter.exe
-     1>Done Building Project "\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\DirectX11_Starter.vcxproj" (Build target(s)).
+         C:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\lib\BulletCollision_vs2010_debug.lib
+         C:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\lib\BulletDynamics_vs2010_debug.lib
+         C:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\lib\LinearMath_vs2010_debug.lib
+         DirectX11_Starter.vcxproj -> C:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\Debug\DirectX11_Starter.exe
+     1>Done Building Project "C:\Users\Eddie\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\DirectX11_Starter.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:51.70
+Time Elapsed 00:00:02.45
