@@ -86,7 +86,9 @@ MyDemoGame::MyDemoGame(HINSTANCE hInstance)
 	// - "Wide" characters take up more space in memory (hence the name)
 	// - This allows for an extended character set (more fancy letters/symbols)
 	// - Lots of Windows functions want "wide characters", so we use the "L"
-	windowCaption = L"My Super Fancy GGP Game";
+	//windowCaption = L"My Super Fancy GGP Game";
+	windowCaption = L"DirectX 11 Racing Game";
+
 
 	// Custom window size - will be created by Init() later
 	windowWidth = 1280;
@@ -94,22 +96,27 @@ MyDemoGame::MyDemoGame(HINSTANCE hInstance)
 
 
 
-	//initialize
+	//initialize class variables 
+
+	//Meshes 
 	meshOne = nullptr;
 	meshTwo = nullptr;
 	meshThree = nullptr;
 
+	//Entities 
 	e1 = nullptr;
 	e2 = nullptr;
 	e3 = nullptr;
 
+	//Camera 
 	cam = new Camera();
 
+	//Input 
 	leftmouseHeld = false;
 	middlemouseHeld = false;
 	rightmouseHeld = false;
 
-	//Input 
+	//Controller  
 	pad = new GamePadXbox(GamePadIndex_One); 
 
 	//Physics Initialization  
@@ -122,7 +129,8 @@ MyDemoGame::MyDemoGame(HINSTANCE hInstance)
 	dynamicsWorld->setGravity(btVector3(0.0f, -9.81f, 0.0f));
 	//dynamicsWorld->performDiscreteCollisionDetection(); 
 
-	
+	//Game State 
+	gameState = GAME_STATES::MAIN_MENU; 
 	
 }
 
@@ -162,7 +170,11 @@ MyDemoGame::~MyDemoGame()
 	delete MyDemoGame::dynamicsWorld;
 	
 	//Delete HUD
-	delete UI; 
+	for (unsigned int i = 0; i < UI.size(); i++)
+	{
+		UI[i] = nullptr; 
+		delete UI[i]; 
+	}
 
 	//Delete Material
 	delete material;
@@ -261,31 +273,11 @@ void MyDemoGame::UpdatePhysics(float deltaTime)
 		entities[i]->CopyTransformFromBullet(); 
 	}
 
-	// Check Ball 
-	btTransform trans;
+	// Check Ball - Debugging 
+	/*btTransform trans;
 	entities[1]->motionState->getWorldTransform(trans);
-
-	//cout << "Sphere height: " << trans.getOrigin().getY() << endl; 
+	cout << "Sphere height: " << trans.getOrigin().getY() << endl; */
 	
-
-	
-
-	/*int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds(); 
-	if (numManifolds > 0)
-	{
-		entities[1]->collider->activate(true); 
-		entities[1]->collider->applyForce(btVector3(0, -20.0f, 0), btVector3(0,0,0)); 
-	}*/
-		
-	// Check for Collisions 
-	//entities[1]->collider->activate(true); 
-	//entities[1]->collider->applyCentralImpulse(btVector3(0.f, 0.f, -0.005f)); 
-	/*btVector3 floorPos = entities[0]->collider->getCenterOfMassPosition(); 
-	if (entities[1]->collider->getCenterOfMassPosition().dot(floorPos) < 0.25f)
-	{
-		entities[1]->collider->activate(true);
-		entities[1]->collider->applyCentralImpulse(btVector3(0.f, 20.f, 0.0f));
-	}*/
 }
 
 // --------------------------------------------------------
@@ -426,7 +418,11 @@ void MyDemoGame::CreateGeometry()
 	//dynamicsWorld->addRigidBody(entities[1]->collider);
 
 	//Create UI 
+	Selector = new HUD(device, deviceContext, L"Sprites/Sprite1.dds", 0.0f, 0.0f);
+	Text = new HUD(device, deviceContext, L"SpriteFonts/Destroy_32.spritefont", L"Main Menu", windowWidth/2 - 400.0f, windowHeight/2 - 325.0f); 
 
+	UI.push_back(Selector); 
+	UI.push_back(Text); 
 }
 
 
@@ -494,34 +490,54 @@ void MyDemoGame::OnResize()
 float x = 0;
 void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 {
+	//Check if Exiting Game
+	if (gameState == GAME_STATES::EXIT)
+	{
+		Quit();
+	}
+
 	//Physics 
 	UpdatePhysics(deltaTime); 
 	
 
-	// Quit if the escape key is pressed
-	if (GetAsyncKeyState(VK_ESCAPE))
-		Quit();
-
-
+		
 	//constants that control movement  
-	float speed = 0.0025f * deltaTime;
+	/*float speed = 0.0025f * deltaTime;
 	float rotation = 0.55f * deltaTime;
-	float buffer = 1.5f;
+	float buffer = 1.5f;*/
 	//update entities
 
-
-
 	//Input --------------------------------------------
-
-	//Check if mouse held
+	//Mouse/Keyboard 
 	//if (leftmouseHeld) { entities[0]->move(XMFLOAT4(speed, 0.f, 0.0f, 0.0f)); }
 	//if (middlemouseHeld) { entities[1]->collider->applyCentralImpulse(btVector3(0.0f, 200.0f, 0.0f)); }
+
+	// Quit if the escape key is pressed
+	if (GetAsyncKeyState(VK_ESCAPE))
+	{
+		gameState = GAME_STATES::EXIT;
+	}
+
+	if (GetAsyncKeyState('H') & 0x8000)
+	{
+		gameState = GAME_STATES::PLAYING; 
+	}
+	if (GetAsyncKeyState('G') & 0x8000)
+	{
+		gameState = GAME_STATES::OPTIONS;
+	}
+	if (GetAsyncKeyState('F') & 0x8000)
+	{
+		gameState = GAME_STATES::MAIN_MENU;
+	}
+
+	//Game Pad Input 
 	pad->State.reset();
-	 if (rightmouseHeld) 
-	 { 
-		 entities[1]->collider->applyImpulse(btVector3(0.0f, 50.0f, 0.0f), btVector3(0,0,0));  
-		 rightmouseHeld = false; 
-	 }
+	if (rightmouseHeld) 
+	{ 
+		entities[1]->collider->applyImpulse(btVector3(0.0f, 50.0f, 0.0f), btVector3(0,0,0));  
+		rightmouseHeld = false; 
+	}
 	
 
 
@@ -534,7 +550,7 @@ void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 		 //Quit with back button 
 		 if (pad->State._buttons[GamePad_Button_BACK] == true)
 		 {
-			 Quit(); 
+			 gameState = GAME_STATES::EXIT; 
 		 }
 		 //Bounce Ball with A 
 		 else if (pad->State._buttons[GamePad_Button_A] == true)
@@ -555,6 +571,25 @@ void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 		entities[i]->updateScene();
 	}
 
+	//Update UI 
+	if (gameState == GAME_STATES::MAIN_MENU)
+	{
+		UI[1]->changeText(L"Game State: Main Menu"); 
+	}
+	else if (gameState == GAME_STATES::PLAYING)
+	{
+		UI[1]->changeText(L"Game State: Playing");
+	}
+	else if (gameState == GAME_STATES::OPTIONS)
+	{
+		UI[1]->changeText(L"Game State: Options");
+	}
+
+	for (unsigned int i = 0; i < UI.size(); i++)
+	{
+		UI[i]->Update();
+	}
+	
 
 	//update Camera and it's input
 	cam->cameraInput(deltaTime);
@@ -610,7 +645,19 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
 		entities[i]->drawScene(deviceContext);
 	}
 
-
+	//Draw UI
+	/*if (gameState == GAME_STATES::MAIN_MENU)
+	{
+		for (unsigned int i = 0; i < UI.size(); i++)
+		{
+			UI[i]->Render();
+		}
+	}*/
+	for (unsigned int i = 0; i < UI.size(); i++)
+	{
+		UI[i]->Render();
+	}
+	
 
 	// Present the buffer
 	//  - Puts the image we're drawing into the window so the user can see it

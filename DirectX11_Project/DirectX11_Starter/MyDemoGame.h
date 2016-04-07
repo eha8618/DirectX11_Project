@@ -26,6 +26,11 @@
 // Game class which extends the base DirectXGameCore class
 // --------------------------------------------------------
 
+//Game State Machine
+static enum class GAME_STATES { MAIN_MENU, PLAYING, OPTIONS, EXIT};
+//Game State
+static GAME_STATES gameState;
+
 class MyDemoGame : public DirectXGameCore
 {
 public:
@@ -57,6 +62,7 @@ public:
 
 	void UpdatePhysics(float deltaTime); 
 
+	
 
 
 private:
@@ -72,7 +78,7 @@ private:
 	Mesh* meshTwo;
 	Mesh* meshThree;
 
-	////Entities 
+	////Entities - represent game objects
 
 	Entity* e1;
 	Entity* e2;
@@ -86,7 +92,10 @@ private:
 	GamePadXbox* pad; 
 
 	//HUD
-	HUD* UI; 
+	HUD* Selector;
+	HUD* Text; 
+	vector<HUD*> UI; 
+	
 
 	//Material 
 	Material* material;
