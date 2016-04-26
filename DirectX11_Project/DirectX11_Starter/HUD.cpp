@@ -43,6 +43,8 @@ HUD::HUD(ID3D11Device * device, ID3D11DeviceContext * deviceContext, const wchar
 
 	//Font 
 	spriteFont.reset(new SpriteFont(device, fileName)); 
+	//spriteFont = make_unique<SpriteFont>(SpriteFont(device, fileName)); 
+
 	
 	isSpriteFont = true; 
 }
@@ -58,7 +60,7 @@ HUD::~HUD()
 	}
 	else
 	{
-		//Memory::SafeRelease(texture) ?? 
+		//Memory::SafeRelease(texture) 
 		texture->Release();
 	}
 	

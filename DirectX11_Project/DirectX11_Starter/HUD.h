@@ -24,7 +24,7 @@ public:
 	void changeText(const wchar_t* newText); 
 
 private: 
-	//SpriteBatch* spriteBatch; 
+	//SpriteBatch* spriteBatch; was using unique ptr here 
 	unique_ptr<SpriteBatch> spriteBatch; 
 	unique_ptr<SpriteFont> spriteFont; 
 	ID3D11ShaderResourceView* texture; 

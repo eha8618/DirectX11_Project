@@ -1,9 +1,1 @@
-﻿Build started 4/7/2016 12:37:44 AM.
-     1>Project "C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\DirectX11_Starter\Bullet\build\vs2010_dx11\BulletDynamics.vcxproj" on node 3 (Build target(s)).
-     1>Lib:
-         BulletDynamics.vcxproj -> C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\DirectX11_Starter\Bullet\build\vs2010_dx11\..\..\lib\BulletDynamics_vs2010_debug.lib
-     1>Done Building Project "C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\DirectX11_Starter\Bullet\build\vs2010_dx11\BulletDynamics.vcxproj" (Build target(s)).
-
-Build succeeded.
-
-Time Elapsed 00:00:00.04
+﻿  BulletDynamics.vcxproj -> \\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\build\vs2010_dx11\..\..\lib\BulletDynamics_vs2010_debug.lib

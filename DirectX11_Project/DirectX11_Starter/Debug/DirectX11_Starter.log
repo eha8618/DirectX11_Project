@@ -1,30 +1,19 @@
-﻿Build started 4/7/2016 3:22:19 AM.
-     1>Project "C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\DirectX11_Starter\DirectX11_Starter.vcxproj" on node 2 (Build target(s)).
-     1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /IC:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\packages\directxtk_desktop_2015.2016.2.23.1\build\native\../../build/native/include/ /IC:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\DirectX11_Starter\\Bullet\src /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D HAS_DIRECTXTK /D _CRT_SECURE_NO_WARNINGS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt MyDemoGame.cpp
-         MyDemoGame.cpp
-     1>c:\users\dakota\desktop\directx_project\directx11_project\directx11_starter\mydemogame.h(30): warning C4091: 'static ': ignored on left of 'GAME_STATES' when no variable is declared
-     1>c:\users\dakota\desktop\directx_project\directx11_project\directx11_starter\mydemogame.cpp(271): warning C4018: '<': signed/unsigned mismatch
-     1>c:\users\dakota\desktop\directx_project\directx11_project\directx11_starter\mydemogame.cpp(733): warning C4244: 'initializing': conversion from 'LONG' to 'float', possible loss of data
-     1>c:\users\dakota\desktop\directx_project\directx11_project\directx11_starter\mydemogame.cpp(734): warning C4244: 'initializing': conversion from 'LONG' to 'float', possible loss of data
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\Debug\DirectX11_Starter.exe" /INCREMENTAL /NOLOGO C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\packages\directxtk_desktop_2015.2016.2.23.1\build\native\../../build/native/lib/Win32/Debug/DirectXTKAudioDX.lib C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\packages\directxtk_desktop_2015.2016.2.23.1\build\native\../../build/native/lib/Win32/Debug/DirectXTK.lib d3d11.lib d3dcompiler.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\Debug\DirectX11_Starter.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\Debug\DirectX11_Starter.lib" /MACHINE:X86 Debug\Camera.obj
-         Debug\Entity.obj
-         Debug\GamePadXbox.obj
-         Debug\HUD.obj
-         Debug\Material.obj
-         Debug\Mesh.obj
-         Debug\MyDemoGame.obj
-         Debug\dxerr.obj
-         Debug\DirectXGameCore.obj
-         Debug\SimpleShader.obj
-         Debug\Vehicle.obj
-         C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\DirectX11_Starter\Bullet\lib\BulletCollision_vs2010_debug.lib
-         C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\DirectX11_Starter\Bullet\lib\BulletDynamics_vs2010_debug.lib
-         C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\DirectX11_Starter\Bullet\lib\LinearMath_vs2010_debug.lib
-         DirectX11_Starter.vcxproj -> C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\Debug\DirectX11_Starter.exe
-     1>Done Building Project "C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\DirectX11_Starter\DirectX11_Starter.vcxproj" (Build target(s)).
-
-Build succeeded.
-
-Time Elapsed 00:00:01.98
+﻿\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Shaders\PixelShader.hlsl(72,9-54): warning X3206: implicit truncation of vector type
+\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Shaders\PixelShader.hlsl(73,2-29): warning X3206: implicit truncation of vector type
+\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Shaders\PixelShader.hlsl(82,2-38): warning X3206: implicit truncation of vector type
+\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Shaders\PixelShader.hlsl(118,8-67): warning X3206: implicit truncation of vector type
+\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Shaders\PixelShader.hlsl(119,8-52): warning X3206: implicit truncation of vector type
+\\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Shaders\PixelShader.hlsl(124,2): warning X3206: implicit truncation of vector type
+  
+  compilation object save succeeded; see \\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\Debug\PixelShader.cso
+  Entity.cpp
+\\banner.main.ad.rit.edu\students\dxh8497\igmprofile\documents\directx11_project\directx11_project\directx11_starter\mydemogame.h(31): warning C4091: 'static ': ignored on left of 'GAME_STATES' when no variable is declared
+  Generating Code...
+  Compiling...
+  MyDemoGame.cpp
+\\banner.main.ad.rit.edu\students\dxh8497\igmprofile\documents\directx11_project\directx11_project\directx11_starter\mydemogame.h(31): warning C4091: 'static ': ignored on left of 'GAME_STATES' when no variable is declared
+\\banner.main.ad.rit.edu\students\dxh8497\igmprofile\documents\directx11_project\directx11_project\directx11_starter\mydemogame.cpp(272): warning C4018: '<': signed/unsigned mismatch
+\\banner.main.ad.rit.edu\students\dxh8497\igmprofile\documents\directx11_project\directx11_project\directx11_starter\mydemogame.cpp(734): warning C4244: 'initializing': conversion from 'LONG' to 'float', possible loss of data
+\\banner.main.ad.rit.edu\students\dxh8497\igmprofile\documents\directx11_project\directx11_project\directx11_starter\mydemogame.cpp(735): warning C4244: 'initializing': conversion from 'LONG' to 'float', possible loss of data
+  Generating Code...
+  DirectX11_Starter.vcxproj -> \\banner.main.ad.rit.edu\students\dxh8497\IGMProfile\Documents\DirectX11_Project\DirectX11_Project\Debug\DirectX11_Starter.exe

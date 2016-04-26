@@ -5,6 +5,7 @@
 #include "SimpleShader.h"
 #include "Mesh.h"
 #include "Entity.h"
+#include "vld.h"
 #include "Camera.h"
 #include "Lights.h"
 #include "GamePadXbox.h"
