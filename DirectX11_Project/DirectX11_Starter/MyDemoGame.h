@@ -5,6 +5,7 @@
 #include "SimpleShader.h"
 #include "Mesh.h"
 #include "Entity.h"
+#include "vld.h"
 #include "Camera.h"
 #include "Lights.h"
 #include "GamePadXbox.h"
@@ -12,6 +13,7 @@
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision\Gimpact\btGImpactCollisionAlgorithm.h"
+#include "Skybox.h"
 
 
 
@@ -25,6 +27,11 @@
 // --------------------------------------------------------
 // Game class which extends the base DirectXGameCore class
 // --------------------------------------------------------
+
+//Game State Machine
+static enum class GAME_STATES { MAIN_MENU, PLAYING, OPTIONS, EXIT};
+//Game State
+static GAME_STATES gameState;
 
 class MyDemoGame : public DirectXGameCore
 {
@@ -57,6 +64,7 @@ public:
 
 	void UpdatePhysics(float deltaTime); 
 
+	
 
 
 private:
@@ -72,12 +80,17 @@ private:
 	Mesh* meshTwo;
 	Mesh* meshThree;
 
-	////Entities 
+	////Entities - represent game objects
 
 	Entity* e1;
 	Entity* e2;
 	Entity* e3;
 	vector<Entity*> entities;
+
+	//skybox
+	Skybox* skybox;
+
+	Entity* sky;
 
 	//Camera
 	Camera* cam;
@@ -86,7 +99,10 @@ private:
 	GamePadXbox* pad; 
 
 	//HUD
-	HUD* UI; 
+	HUD* Selector;
+	HUD* Text; 
+	vector<HUD*> UI; 
+	
 
 	//Material 
 	Material* material;

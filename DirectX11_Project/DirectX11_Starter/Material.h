@@ -1,6 +1,7 @@
 #pragma once
 #include "SimpleShader.h"
 #include "WICTextureLoader.h"
+#include "DDSTextureLoader.h"
 
 using namespace DirectX; 
 
@@ -11,6 +12,7 @@ public:
 	Material();
 	Material(SimpleVertexShader* vShader, SimplePixelShader* pShader); 
 	Material(SimpleVertexShader* vShader, SimplePixelShader* pShader, ID3D11Device* device, ID3D11DeviceContext* deviceContext, const wchar_t* filePath);
+	Material(SimpleVertexShader* vShader, SimplePixelShader* pShader, ID3D11Device* device, ID3D11DeviceContext* deviceContext, const wchar_t* filePath, bool ddsFile);
 	~Material();
 
 	ID3D11ShaderResourceView* getTextureSRV(); 

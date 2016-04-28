@@ -17,13 +17,22 @@ Material::Material(SimpleVertexShader * vShader, SimplePixelShader* pShader)
 	pixelShader = pShader; 
 }
 
-Material::Material(SimpleVertexShader* vShader, SimplePixelShader* pShader, ID3D11Device* device, ID3D11DeviceContext* deviceContext, const wchar_t* filePath)
+Material::Material(SimpleVertexShader* vShader, SimplePixelShader* pShader, ID3D11Device* device, ID3D11DeviceContext* deviceContext, const wchar_t* filePath, bool ddsFile)
 {
 	vertexShader = vShader;
 	pixelShader = pShader;
 	file = filePath; 
 
-	CreateWICTextureFromFile(device, deviceContext, filePath, 0, &SRV); 
+
+	//check for .dds file
+	if (ddsFile){
+		CreateDDSTextureFromFile(device, deviceContext, filePath, 0, &SRV);
+	}
+	else {
+		CreateWICTextureFromFile(device, deviceContext, filePath, 0, &SRV); 
+	}
+	
+	
 	D3D11_SAMPLER_DESC sampleDescription = {}; 
 //	ZeroMemory(&sampleDescription, sizeof(sampleDescription)); 
 
@@ -35,7 +44,10 @@ Material::Material(SimpleVertexShader* vShader, SimplePixelShader* pShader, ID3D
 
 	device->CreateSamplerState(&sampleDescription, &samplerState);
 }
-
+//dds file not specified, assume false
+Material::Material(SimpleVertexShader* vShader, SimplePixelShader* pShader, ID3D11Device* device, ID3D11DeviceContext* deviceContext, const wchar_t* filePath) :
+	Material(vShader, pShader, device, deviceContext, filePath, false){
+}
 
 Material::~Material()
 {

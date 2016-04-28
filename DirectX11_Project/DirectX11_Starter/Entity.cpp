@@ -172,12 +172,18 @@ void Entity::setPosition(float x, float y, float z)
 
 void Entity::setScale(XMFLOAT3 newScale)
 {
-	
+	scalar = XMFLOAT4X4
+		(newScale.x , 0, 0, 0,
+			0, newScale.y , 0, 0,
+			0, 0, newScale.z , 0,
+			0, 0, 0, 1);
+	/*
 	scalar = XMFLOAT4X4
 		(newScale.x * scalar._11, scalar._12, scalar._13, scalar._14,
 			scalar._21, newScale.y * scalar._23, scalar._23, scalar._24,
 			scalar._31, scalar._32, newScale.z * scalar._33, scalar._34,
 			scalar._41, scalar._42, scalar._43, scalar._44);
+			*/
 }
 
 void Entity::setWorldMatrix(XMFLOAT4X4 newWorldMatrix)

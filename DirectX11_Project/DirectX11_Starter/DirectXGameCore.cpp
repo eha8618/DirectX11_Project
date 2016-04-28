@@ -67,8 +67,8 @@ DirectXGameCore::DirectXGameCore(HINSTANCE hInstance)
 	// Zero out the viewport struct
 	ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
 
-	AllocConsole(); 
-	freopen("CONOUT$", "w", stdout);
+	//AllocConsole(); 
+	//freopen("CONOUT$", "w", stdout);
 	cout << "Test!" << endl; 
 
 	// Set the global pointer to this DirectXGameCore object so we can forward
