@@ -9,6 +9,7 @@
 #include "Lights.h"
 #include "GamePadXbox.h"
 #include "HUD.h"
+#include "DrawDebug.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
 #include "BulletCollision\Gimpact\btGImpactCollisionAlgorithm.h"
@@ -25,11 +26,6 @@
 // --------------------------------------------------------
 // Game class which extends the base DirectXGameCore class
 // --------------------------------------------------------
-
-//Game State Machine
-static enum class GAME_STATES { MAIN_MENU, PLAYING, OPTIONS, EXIT};
-//Game State
-static GAME_STATES gameState;
 
 class MyDemoGame : public DirectXGameCore
 {
@@ -62,7 +58,9 @@ public:
 
 	void UpdatePhysics(float deltaTime); 
 
-	
+	int engForce = 40;
+	int brakeForce = 2;
+
 
 
 private:
@@ -77,12 +75,17 @@ private:
 	Mesh* meshOne;
 	Mesh* meshTwo;
 	Mesh* meshThree;
+	Mesh* meshFour;
 
-	////Entities - represent game objects
+	////Entities 
 
 	Entity* e1;
 	Entity* e2;
 	Entity* e3;
+	Entity* e4;
+	Entity* e5;
+	Entity* e6;
+	Entity* e7;
 	vector<Entity*> entities;
 
 	//Camera
@@ -92,13 +95,20 @@ private:
 	GamePadXbox* pad; 
 
 	//HUD
-	HUD* Selector;
-	HUD* Text; 
-	vector<HUD*> UI; 
-	
+	HUD* UI; 
+
+	//Debug Lines
+	//ID3D11Buffer* DrawDebugVB;
+	SimpleVertexShader* DrawDebugVertexShader;
+	SimplePixelShader* DrawDebugPixelShader;
+	DrawDebug* drawDebug; 
 
 	//Material 
 	Material* material;
+	Material* carMaterial;
+
+	// car
+	btRaycastVehicle* vehicle;
 
 	//Lights
 	DirectionalLight directionalLight;

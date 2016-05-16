@@ -1,9 +1,48 @@
-﻿Build started 4/7/2016 12:37:44 AM.
-     1>Project "C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\DirectX11_Starter\Bullet\build\vs2010_dx11\BulletDynamics.vcxproj" on node 3 (Build target(s)).
-     1>Lib:
-         BulletDynamics.vcxproj -> C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\DirectX11_Starter\Bullet\build\vs2010_dx11\..\..\lib\BulletDynamics_vs2010_debug.lib
-     1>Done Building Project "C:\Users\Dakota\Desktop\DirectX_Project\DirectX11_Project\DirectX11_Starter\Bullet\build\vs2010_dx11\BulletDynamics.vcxproj" (Build target(s)).
+﻿Build started 5/16/2016 5:33:27 PM.
+     1>Project "C:\Users\Dakota\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\build\vs2010_dx11\BulletDynamics.vcxproj" on node 3 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /I..\..\src /I"C:\Program Files (x86)\Visual Leak Detector\include" /Zi /nologo /W3 /WX- /Od /Oy- /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE /D _HAS_EXCEPTIONS=0 /D _MBCS /Gm- /RTC1 /MDd /GS /Gy /fp:fast /Zc:wchar_t /Zc:forScope /Zc:inline /GR- /Fo"obj\x32\Debug\BulletDynamics\\" /Fd"..\..\lib\BulletDynamics_vs2010_debug.pdb" /Gd /TP /analyze- /errorReport:prompt /MP ..\..\src\BulletDynamics\Character\btKinematicCharacterController.cpp ..\..\src\BulletDynamics\ConstraintSolver\btSequentialImpulseConstraintSolver.cpp ..\..\src\BulletDynamics\Dynamics\btDiscreteDynamicsWorld.cpp "..\..\src\BulletDynamics\Dynamics\Bullet-C-API.cpp" ..\..\src\BulletDynamics\Vehicle\btRaycastVehicle.cpp
+         btKinematicCharacterController.cpp
+         btSequentialImpulseConstraintSolver.cpp
+         btDiscreteDynamicsWorld.cpp
+         Bullet-C-API.cpp
+         btRaycastVehicle.cpp
+     1>C:\Users\Dakota\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\src\BulletDynamics/ConstraintSolver/btContactConstraint.h(25): warning C4359: 'btContactConstraint': Alignment specifier is less than actual alignment (128), and will be ignored. (compiling source file ..\..\src\BulletDynamics\Dynamics\btDiscreteDynamicsWorld.cpp)
+     1>C:\Users\Dakota\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\src\BulletDynamics/ConstraintSolver/btContactConstraint.h(25): warning C4359: 'btContactConstraint': Alignment specifier is less than actual alignment (128), and will be ignored. (compiling source file ..\..\src\BulletDynamics\Vehicle\btRaycastVehicle.cpp)
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\Lib.exe /OUT:"..\..\lib\BulletDynamics_vs2010_debug.lib" /LIBPATH:"C:\Program Files (x86)\Visual Leak Detector\lib\Win32" /NOLOGO /MACHINE:X86 obj\x32\Debug\BulletDynamics\btKinematicCharacterController.obj
+         obj\x32\Debug\BulletDynamics\btConeTwistConstraint.obj
+         obj\x32\Debug\BulletDynamics\btContactConstraint.obj
+         obj\x32\Debug\BulletDynamics\btFixedConstraint.obj
+         obj\x32\Debug\BulletDynamics\btGearConstraint.obj
+         obj\x32\Debug\BulletDynamics\btGeneric6DofConstraint.obj
+         obj\x32\Debug\BulletDynamics\btGeneric6DofSpringConstraint.obj
+         obj\x32\Debug\BulletDynamics\btHinge2Constraint.obj
+         obj\x32\Debug\BulletDynamics\btHingeConstraint.obj
+         obj\x32\Debug\BulletDynamics\btPoint2PointConstraint.obj
+         obj\x32\Debug\BulletDynamics\btSequentialImpulseConstraintSolver.obj
+         obj\x32\Debug\BulletDynamics\btSliderConstraint.obj
+         obj\x32\Debug\BulletDynamics\btSolve2LinearConstraint.obj
+         obj\x32\Debug\BulletDynamics\btTypedConstraint.obj
+         obj\x32\Debug\BulletDynamics\btUniversalConstraint.obj
+         obj\x32\Debug\BulletDynamics\btDiscreteDynamicsWorld.obj
+         obj\x32\Debug\BulletDynamics\btRigidBody.obj
+         obj\x32\Debug\BulletDynamics\btSimpleDynamicsWorld.obj
+         "obj\x32\Debug\BulletDynamics\Bullet-C-API.obj"
+         obj\x32\Debug\BulletDynamics\btMultiBody.obj
+         obj\x32\Debug\BulletDynamics\btMultiBodyConstraint.obj
+         obj\x32\Debug\BulletDynamics\btMultiBodyConstraintSolver.obj
+         obj\x32\Debug\BulletDynamics\btMultiBodyDynamicsWorld.obj
+         obj\x32\Debug\BulletDynamics\btMultiBodyJointLimitConstraint.obj
+         obj\x32\Debug\BulletDynamics\btMultiBodyJointMotor.obj
+         obj\x32\Debug\BulletDynamics\btMultiBodyPoint2Point.obj
+         obj\x32\Debug\BulletDynamics\btDantzigLCP.obj
+         obj\x32\Debug\BulletDynamics\btMLCPSolver.obj
+         obj\x32\Debug\BulletDynamics\btRaycastVehicle.obj
+         obj\x32\Debug\BulletDynamics\btWheelInfo.obj
+         BulletDynamics.vcxproj -> C:\Users\Dakota\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\build\vs2010_dx11\..\..\lib\BulletDynamics_vs2010_debug.lib
+     1>Done Building Project "C:\Users\Dakota\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\build\vs2010_dx11\BulletDynamics.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.04
+Time Elapsed 00:00:06.07

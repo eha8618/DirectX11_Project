@@ -86,9 +86,7 @@ MyDemoGame::MyDemoGame(HINSTANCE hInstance)
 	// - "Wide" characters take up more space in memory (hence the name)
 	// - This allows for an extended character set (more fancy letters/symbols)
 	// - Lots of Windows functions want "wide characters", so we use the "L"
-	//windowCaption = L"My Super Fancy GGP Game";
-	windowCaption = L"DirectX 11 Racing Game";
-
+	windowCaption = L"My Super Fancy GGP Game";
 
 	// Custom window size - will be created by Init() later
 	windowWidth = 1280;
@@ -96,41 +94,38 @@ MyDemoGame::MyDemoGame(HINSTANCE hInstance)
 
 
 
-	//initialize class variables 
-
-	//Meshes 
+	//initialize
 	meshOne = nullptr;
 	meshTwo = nullptr;
 	meshThree = nullptr;
 
-	//Entities 
 	e1 = nullptr;
 	e2 = nullptr;
 	e3 = nullptr;
 
-	//Camera 
 	cam = new Camera();
 
-	//Input 
 	leftmouseHeld = false;
 	middlemouseHeld = false;
 	rightmouseHeld = false;
 
-	//Controller  
+	//Input 
 	pad = new GamePadXbox(GamePadIndex_One); 
 
 	//Physics Initialization  
 	collisionConfiguration = new btDefaultCollisionConfiguration();
 	dispatcher = new btCollisionDispatcher(collisionConfiguration);
-	broadphase = new btDbvtBroadphase();
+	//broadphase = new btDbvtBroadphase();
+	btVector3 worldMin(-1000, -1000, -1000);
+	btVector3 worldMax(1000, 1000, 1000);
+	broadphase = new btAxisSweep3(worldMin, worldMax);
 	solver = new btSequentialImpulseConstraintSolver();
 	
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 	dynamicsWorld->setGravity(btVector3(0.0f, -9.81f, 0.0f));
 	//dynamicsWorld->performDiscreteCollisionDetection(); 
 
-	//Game State 
-	gameState = GAME_STATES::MAIN_MENU; 
+	
 	
 }
 
@@ -148,6 +143,13 @@ MyDemoGame::~MyDemoGame()
 	// Delete our simple shaders
 	delete vertexShader;
 	delete pixelShader;
+
+	//delete debug shaders
+	delete DrawDebugVertexShader; 
+	delete DrawDebugPixelShader; 
+	delete drawDebug; 
+	//release
+	//ReleaseMacro(DrawDebugVB); 
 
 	// Delete Meshes
 	delete meshOne;
@@ -170,11 +172,7 @@ MyDemoGame::~MyDemoGame()
 	delete MyDemoGame::dynamicsWorld;
 	
 	//Delete HUD
-	for (unsigned int i = 0; i < UI.size(); i++)
-	{
-		UI[i] = nullptr; 
-		delete UI[i]; 
-	}
+	delete UI; 
 
 	//Delete Material
 	delete material;
@@ -273,11 +271,31 @@ void MyDemoGame::UpdatePhysics(float deltaTime)
 		entities[i]->CopyTransformFromBullet(); 
 	}
 
-	// Check Ball - Debugging 
-	/*btTransform trans;
+	// Check Ball 
+	btTransform trans;
 	entities[1]->motionState->getWorldTransform(trans);
-	cout << "Sphere height: " << trans.getOrigin().getY() << endl; */
+
+	//cout << "Sphere height: " << trans.getOrigin().getY() << endl; 
 	
+	
+	
+
+	/*int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds(); 
+	if (numManifolds > 0)
+	{
+		entities[1]->collider->activate(true); 
+		entities[1]->collider->applyForce(btVector3(0, -20.0f, 0), btVector3(0,0,0)); 
+	}*/
+		
+	// Check for Collisions 
+	//entities[1]->collider->activate(true); 
+	//entities[1]->collider->applyCentralImpulse(btVector3(0.f, 0.f, -0.005f)); 
+	/*btVector3 floorPos = entities[0]->collider->getCenterOfMassPosition(); 
+	if (entities[1]->collider->getCenterOfMassPosition().dot(floorPos) < 0.25f)
+	{
+		entities[1]->collider->activate(true);
+		entities[1]->collider->applyCentralImpulse(btVector3(0.f, 20.f, 0.0f));
+	}*/
 }
 
 // --------------------------------------------------------
@@ -292,6 +310,13 @@ void MyDemoGame::LoadShaders()
 
 	pixelShader = new SimplePixelShader(device, deviceContext);
 	pixelShader->LoadShaderFile(L"PixelShader.cso");
+
+	//Load Debug Shaders
+	DrawDebugVertexShader = new SimpleVertexShader(device, deviceContext); 
+	DrawDebugVertexShader->LoadShaderFile(L"DebugLineVS.cso"); 
+
+	DrawDebugPixelShader = new SimplePixelShader(device, deviceContext);
+	DrawDebugPixelShader->LoadShaderFile(L"DebugLinePS.cso");
 }
 
 
@@ -329,7 +354,7 @@ void MyDemoGame::CreateGeometry()
 
 
 	//meshOne = new Mesh(vertices, (int)sizeof(vertices), indices, sizeof(indices), device);
-	meshOne = new Mesh("Models/cube.obj", device);
+	meshOne = new Mesh("Models/car_body.obj", device);
 
 
 	//Create second Mesh
@@ -355,7 +380,9 @@ void MyDemoGame::CreateGeometry()
 	unsigned int triTwoIndices[] = { 0 , 1, 2 };
 
 	//meshThree = new Mesh(triTwoVerts, (int)sizeof(triTwoVerts), triTwoIndices, sizeof(triTwoIndices), device);
-	meshThree = new Mesh("Models/cube.obj", device);
+	meshThree = new Mesh("Models/flatsurface.obj", device);
+
+	meshFour = new Mesh("Models/car_wheel.obj", device);
 
 
 	// Setup Physics
@@ -364,7 +391,8 @@ void MyDemoGame::CreateGeometry()
 	//btCollisionShape* shape2 = meshTwo->triMesh; //sphere 
 	/*btCollisionShape* shape1 = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
 	btCollisionShape* shape2 = new btSphereShape(1); */
-	btStaticPlaneShape* shape1 = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
+	//btStaticPlaneShape* shape1 = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
+	btBoxShape* shape1 = new btBoxShape(btVector3(25, 0.01f, 25));
 	btSphereShape* shape2 = new btSphereShape(1);
 
 
@@ -373,7 +401,7 @@ void MyDemoGame::CreateGeometry()
 	t.setOrigin(btVector3(0, 0, 0)); */
 
 	// Motion States and Rigid Bodies for collision shapes
-	btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0.0f, 0)));
+	btDefaultMotionState* groundMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -10.0f, 0)));
 	btRigidBody::btRigidBodyConstructionInfo
 		groundRigidBodyCI(0, groundMotionState, shape1, btVector3(0.0f, 0.0f, 0.0f));
 	btRigidBody* groundRigidBody = new btRigidBody(groundRigidBodyCI);
@@ -384,25 +412,147 @@ void MyDemoGame::CreateGeometry()
 
 
 	btDefaultMotionState* fallMotionState =
-		new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 200.0f, 0.0f)));
+		new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 20.0f, 0.0f)));
 	btScalar mass = 1;
 	btVector3 fallInertia(0.0f, 0.0f, 0.0f);
 	shape2->calculateLocalInertia(mass, fallInertia);
 	btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, shape2, fallInertia);
+	fallRigidBodyCI.m_restitution = .2f;
 	btRigidBody* fallRigidBody = new btRigidBody(fallRigidBodyCI);
 	 
 	dynamicsWorld->addRigidBody(fallRigidBody); 
+
+
+
+	// BULLET VEHICLE -- reference to vehicle demo, and user ainurakne for a wheel problem -------------------------------------------------------------
+	
+	// make chassis with a collision shape and a rigid body, also added to dynamic world
+	btScalar chassisMass(1.0f);
+	btVector3 chassisInertia(0.0f, 0.0f, 0.0f);
+
+	btCollisionShape* chassisShape = new btBoxShape(btVector3(1.0f, .5f, 2.0f));
+	btCompoundShape* compound = new btCompoundShape(); 
+	btTransform localTrans; 
+	localTrans.setIdentity(); 
+	localTrans.setOrigin(btVector3(0, 1, 0)); //collider location 
+	compound->addChildShape(localTrans, chassisShape); 
+
+	btTransform tr; 
+	tr.setIdentity(); 
+	tr.setOrigin(btVector3(0, -5.00f, 0)); //Controls where car spawns/renders 
+		// meshOne->conMesh;
+		//new btBoxShape(btVector3(1.0f, .5f, 2.0f));
+
+	//btDefaultMotionState* chassisMotionState = new btDefaultMotionState(btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f), btVector3(0.0f, 5.0f, 0.0f)));
+	btDefaultMotionState* chassisMotionState = new btDefaultMotionState(tr);
+
+	chassisShape->calculateLocalInertia(chassisMass, chassisInertia);
+
+	//btRigidBody::btRigidBodyConstructionInfo chassisRBCI(chassisMass, chassisMotionState, chassisShape, chassisInertia);
+	btRigidBody::btRigidBodyConstructionInfo chassisRBCI(chassisMass, chassisMotionState, compound, chassisInertia);
+	btRigidBody* chassisRB = new btRigidBody(chassisRBCI);
+	//dynamicsWorld->addRigidBody(chassisRB);
+	float wheelWidth = 0.4f; 
+	float wheelRadius = 0.4f; 
+	btCylinderShapeX* m_wheelShape = new btCylinderShapeX(btVector3(wheelWidth, wheelRadius, wheelRadius));
+
+	//set world transform
+	chassisRB->setWorldTransform(tr); 
+	chassisRB->setContactProcessingThreshold(BT_LARGE_FLOAT); 
+
+	//Initialize more values
+	chassisRB->setCenterOfMassTransform(btTransform::getIdentity());
+	chassisRB->setLinearVelocity(btVector3(0, 0, 0)); 
+	chassisRB->setAngularVelocity(btVector3(0, 0, 0)); 
+	dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(chassisRB->getBroadphaseHandle(), dynamicsWorld->getDispatcher()); 
+	//vehicle->resetSuspension(); 
+
+	/*for (int i = 0; i < vehicle->getNumWheels(); i++)
+	{
+		vehicle->updateWheelTransform(i, true); 
+	}*/
+
+	// setting raycasting for wheels and making vehicle
+	btRaycastVehicle::btVehicleTuning tune;
+	btVehicleRaycaster* caster = new btDefaultVehicleRaycaster(dynamicsWorld);
+	vehicle = new btRaycastVehicle(tune, chassisRB, caster);
+	chassisRB->setActivationState(DISABLE_DEACTIVATION);
+	dynamicsWorld->addRigidBody(vehicle->getRigidBody()); 
+	dynamicsWorld->addVehicle(vehicle);
+	
+	float connectionHeight = 1.2f; 
+	float CUBE_HALF_EXTENTS = 1.0f; 
+	float suspensionStiffness = 20.0f; 
+	float suspensionDamping = 2.3f; 
+	float suspensionCompression = 4.4f; 
+	float rollInfluence = 0.1f;
+	float wheelFriction = 1000; 
+	vehicle->setCoordinateSystem(0, 1, 2);
+
+	// make wheels, also keep them under the half-length of chassis
+	btVector3 wheelDirectionCS0(0.0f, -1.0f, 0.0f);
+	btVector3 wheelAxleCS(-1.0f, 0.0f, 0.0f);
+	btScalar suspensionRestLength(0.6f);
+	btScalar wheelRad(0.4f);
+
+	//btVector3 connectionPointCS0(0, 0, -5);
+
+	btVector3 connectionPointCS0(CUBE_HALF_EXTENTS - (0.3*wheelWidth), connectionHeight, 2 * CUBE_HALF_EXTENTS - wheelRadius);
+	vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, tune, true);
+
+	connectionPointCS0 = btVector3(-CUBE_HALF_EXTENTS + (0.3*wheelWidth), connectionHeight, 2 * CUBE_HALF_EXTENTS - wheelRadius);
+	vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, tune, true);
+
+	connectionPointCS0 = btVector3(-CUBE_HALF_EXTENTS + (0.3*wheelWidth), connectionHeight, -2 * CUBE_HALF_EXTENTS + wheelRadius);
+	vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, tune, false);
+
+	connectionPointCS0 = btVector3(CUBE_HALF_EXTENTS - (0.3*wheelWidth), connectionHeight, -2 * CUBE_HALF_EXTENTS + wheelRadius);
+	vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, tune, false);
+
 	
 
+	for (int i = 0; i < 3; i++)
+	{
+		btWheelInfo& wheel = vehicle->getWheelInfo(i);
+		wheel.m_suspensionStiffness = suspensionStiffness;
+		wheel.m_wheelsDampingRelaxation = suspensionDamping;
+		wheel.m_wheelsDampingCompression = suspensionCompression;
+		wheel.m_frictionSlip = wheelFriction;
+		wheel.m_rollInfluence = rollInfluence;
+	}
+	
+	//cout << vehicle->getChassisWorldTransform().getOrigin().getX() << " " << vehicle->getChassisWorldTransform().getOrigin().getY() << " " << vehicle->getChassisWorldTransform().getOrigin().getZ();
 
+	// END VEHICLE -------------------------------------------------------------------------------------------------------------
 
 	//Create Material 
 	material = new Material(vertexShader, pixelShader, device, deviceContext, L"Textures/rust.jpg");
-	//Create entities 
-	e1 = new Entity(meshOne, material, shape1, groundMotionState, groundRigidBody);
-	e2 = new Entity(meshTwo, material, shape2, fallMotionState, fallRigidBody);
-	//e3 = new Entity(meshTwo, material);
+
+
 	
+	//Create Debug Line Drawer and pass to dynamics world 
+	drawDebug = new DrawDebug(device, deviceContext, cam, DrawDebugVertexShader, DrawDebugPixelShader);
+	drawDebug->setDebugMode(btIDebugDraw::DBG_DrawWireframe);
+	dynamicsWorld->setDebugDrawer(drawDebug); 
+
+	
+	
+	//carMaterial = new Material(vertexShader, pixelShader, device, deviceContext, )
+	//Create entities 
+	e1 = new Entity(meshThree, material, shape1, groundMotionState, groundRigidBody);
+	e2 = new Entity(meshTwo, material, shape2, fallMotionState, fallRigidBody);
+	e3 = new Entity(meshOne, material, chassisShape, chassisMotionState, chassisRB);
+	e4 = new Entity(meshFour, material, shape2, groundMotionState, fallRigidBody);
+	e5 = new Entity(meshFour, material, shape2, groundMotionState, fallRigidBody);
+	e6 = new Entity(meshFour, material, shape2, groundMotionState, fallRigidBody);
+	e7 = new Entity(meshFour, material, shape2, groundMotionState, fallRigidBody);
+
+	
+	dynamicsWorld->removeCollisionObject(e4->collider); 
+	dynamicsWorld->removeCollisionObject(e5->collider);
+	dynamicsWorld->removeCollisionObject(e6->collider);
+	dynamicsWorld->removeCollisionObject(e7->collider);
+
 
 
 	//e2->move(XMFLOAT4(0, 5, 0, 0)); 
@@ -412,17 +562,18 @@ void MyDemoGame::CreateGeometry()
 	//e2->move(XMFLOAT4(0, 10.0f, 13.5f, 0));
 	//organize entities in vector
 	entities.push_back(e1);
-	entities.push_back(e2);
+	entities.push_back(e2); //Ball
+	entities.push_back(e3);
+	entities.push_back(e4);
+	entities.push_back(e5);
+	entities.push_back(e6);
+	entities.push_back(e7);
 	//entities.push_back(e3);
 	//dynamicsWorld->addRigidBody(entities[0]->collider);
 	//dynamicsWorld->addRigidBody(entities[1]->collider);
 
 	//Create UI 
-	Selector = new HUD(device, deviceContext, L"Sprites/Sprite1.dds", 0.0f, 0.0f);
-	Text = new HUD(device, deviceContext, L"SpriteFonts/Destroy_32.spritefont", L"Main Menu", windowWidth/2 - 400.0f, windowHeight/2 - 325.0f); 
 
-	UI.push_back(Selector); 
-	UI.push_back(Text); 
 }
 
 
@@ -490,54 +641,78 @@ void MyDemoGame::OnResize()
 float x = 0;
 void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 {
-	//Check if Exiting Game
-	if (gameState == GAME_STATES::EXIT)
-	{
-		Quit();
-	}
-
 	//Physics 
 	UpdatePhysics(deltaTime); 
-	
-
-		
-	//constants that control movement  
-	/*float speed = 0.0025f * deltaTime;
-	float rotation = 0.55f * deltaTime;
-	float buffer = 1.5f;*/
-	//update entities
-
-	//Input --------------------------------------------
-	//Mouse/Keyboard 
-	//if (leftmouseHeld) { entities[0]->move(XMFLOAT4(speed, 0.f, 0.0f, 0.0f)); }
-	//if (middlemouseHeld) { entities[1]->collider->applyCentralImpulse(btVector3(0.0f, 200.0f, 0.0f)); }
 
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
+		Quit();
+
+	if (GetAsyncKeyState(VK_UP))
 	{
-		gameState = GAME_STATES::EXIT;
+		/*vehicle->applyEngineForce(engForce, 0);
+		vehicle->applyEngineForce(engForce, 1);*/
+		engForce = 100.0f;
+	}
+	if (GetAsyncKeyState(VK_DOWN))
+	{
+		vehicle->setBrake(brakeForce, 0);
+		vehicle->setBrake(brakeForce, 1);
+		brakeForce = 0;
+	}
+	brakeForce = 2;
+
+	for (int i = 0; i < 4; i++)
+	{
+		vehicle->updateWheelTransform(i, true);
 	}
 
-	if (GetAsyncKeyState('H') & 0x8000)
-	{
-		gameState = GAME_STATES::PLAYING; 
-	}
-	if (GetAsyncKeyState('G') & 0x8000)
-	{
-		gameState = GAME_STATES::OPTIONS;
-	}
-	if (GetAsyncKeyState('F') & 0x8000)
-	{
-		gameState = GAME_STATES::MAIN_MENU;
-	}
+	btVector3 chaPos = vehicle->getChassisWorldTransform().getOrigin();
 
-	//Game Pad Input 
+	//e3->CopyTransformFromBullet();
+	
+	//e3->setPosition(chaPos.getX(), chaPos.getY(), chaPos.getZ());
+
+	btVector3 frRWheel = vehicle->getWheelInfo(0).m_worldTransform.getOrigin();
+	//e4->CopyTransformFromBullet();
+	e4->setPosition(frRWheel.getX(), frRWheel.getY(), frRWheel.getZ());
+
+	btVector3 frLWheel = vehicle->getWheelInfo(1).m_worldTransform.getOrigin();
+	//e5->CopyTransformFromBullet();
+	e5->setPosition(frLWheel.getX(), frLWheel.getY(), frLWheel.getZ());
+
+	btVector3 baRWheel = vehicle->getWheelInfo(2).m_worldTransform.getOrigin();
+	//e6->CopyTransformFromBullet();
+	e6->setPosition(baRWheel.getX(), baRWheel.getY(), baRWheel.getZ());
+
+	btVector3 baLWheel = vehicle->getWheelInfo(3).m_worldTransform.getOrigin();
+	//e7->CopyTransformFromBullet();
+	e7->setPosition(baLWheel.getX(), baLWheel.getY(), baLWheel.getZ());
+
+	//drawDebug->drawLine(btVector3(0.0f, 0.0f, 0.0f), btVector3(0.0f, 1.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f)); 
+
+	//constants that control movement  
+	float speed = 0.0025f * deltaTime;
+	float rotation = 0.55f * deltaTime;
+	float buffer = 1.5f;
+	//update entities
+
+
+	//Input --------------------------------------------
+
+	//Check if mouse held
+	if (leftmouseHeld) {
+		vehicle->applyEngineForce(.20f, 0); 
+		vehicle->applyEngineForce(.20f, 1);
+		vehicle->applyEngineForce(.20f, 2);
+		vehicle->applyEngineForce(.20f, 3);
+	}
+	//if (middlemouseHeld) { entities[1]->collider->applyCentralImpulse(btVector3(0.0f, 200.0f, 0.0f)); }
 	pad->State.reset();
-	if (rightmouseHeld) 
-	{ 
-		entities[1]->collider->applyImpulse(btVector3(0.0f, 50.0f, 0.0f), btVector3(0,0,0));  
-		rightmouseHeld = false; 
-	}
+	 if (rightmouseHeld) 
+	 { 
+		 entities[1]->collider->applyImpulse(btVector3(0.0f, 50.0f, 0.0f), btVector3(0,0,0));  
+	 }
 	
 
 
@@ -550,13 +725,19 @@ void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 		 //Quit with back button 
 		 if (pad->State._buttons[GamePad_Button_BACK] == true)
 		 {
-			 gameState = GAME_STATES::EXIT; 
+			 Quit(); 
 		 }
 		 //Bounce Ball with A 
 		 else if (pad->State._buttons[GamePad_Button_A] == true)
 		 {
 			 //Make value small because of FPS 
-			 entities[1]->collider->applyImpulse(btVector3(0.0f, 0.1f, 0.0f), btVector3(0, 0, 0));
+			 cout << "a pressed";
+			 //entities[1]->collider->applyImpulse(btVector3(0.0f, 0.1f, 0.0f), btVector3(0, 0, 0));
+			 
+			 vehicle->applyEngineForce(.20f, 0);
+			 vehicle->applyEngineForce(.20f, 1);
+			 vehicle->applyEngineForce(.20f, 2);
+			 vehicle->applyEngineForce(.20f, 3);
 		 }
 		 
 		 
@@ -571,29 +752,13 @@ void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 		entities[i]->updateScene();
 	}
 
-	//Update UI 
-	if (gameState == GAME_STATES::MAIN_MENU)
-	{
-		UI[1]->changeText(L"Game State: Main Menu"); 
-	}
-	else if (gameState == GAME_STATES::PLAYING)
-	{
-		UI[1]->changeText(L"Game State: Playing");
-	}
-	else if (gameState == GAME_STATES::OPTIONS)
-	{
-		UI[1]->changeText(L"Game State: Options");
-	}
-
-	for (unsigned int i = 0; i < UI.size(); i++)
-	{
-		UI[i]->Update();
-	}
 	
+
 
 	//update Camera and it's input
 	cam->cameraInput(deltaTime);
 	cam->update(deltaTime);
+	drawDebug->Update(); 
 }
 
 
@@ -605,6 +770,8 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
 {
 	// Background color (Cornflower Blue in this case) for clearing
 	const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
+	//const float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
 
 	// Clear the render target and depth buffer (erases what's on the screen)
 	//  - Do this ONCE PER FRAME
@@ -623,7 +790,7 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
 	//    you'll need to swap the current shaders before each draw
 	vertexShader->SetShader(true);
 	pixelShader->SetShader(true);
-	//for (int i = 0; i < entities.size(); i++)
+	
 	for (unsigned int i = 0; i < entities.size(); i++)
 	{
 		// Send data to shader variables
@@ -631,34 +798,23 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
 		//  - This is actually a complex process of copying data to a local buffer
 		//    and then copying that entire buffer to the GPU.  
 		//  - The "SimpleShader" class handles all of that for you.
-		//XMFLOAT4X4 wm = entities[i]->getWorldMatrix();
-		//vertexShader->SetMatrix4x4("world", wm);
-		//vertexShader->CopyAllBufferData();
-		////draw here 
-		//entities[i]->drawScene(deviceContext);
-		////vertexShader->SetMatrix4x4("view", viewMatrix);
-		//vertexShader->SetMatrix4x4("view", cam->getViewMatrix());
-		//vertexShader->SetMatrix4x4("projection", cam->getProjectionMatrix());
-
 		entities[i]->prepareMaterial(cam->getViewMatrix(), cam->getProjectionMatrix());
 		//draw here 
 		entities[i]->drawScene(deviceContext);
 	}
-
-	//Draw UI
-	/*if (gameState == GAME_STATES::MAIN_MENU)
-	{
-		for (unsigned int i = 0; i < UI.size(); i++)
-		{
-			UI[i]->Render();
-		}
-	}*/
-	for (unsigned int i = 0; i < UI.size(); i++)
-	{
-		UI[i]->Render();
-	}
+	//Testing debug lines 
+	//Debug lines 
+	dynamicsWorld->debugDrawWorld();
+	//drawDebug->drawLine(btVector3(0.0f, 0.0f, 0.0f), btVector3(0.0f, 1.0f, 1.0f), btVector3(1.0f, 0.0f, 0.0f)); 
+	DrawDebugVertexShader->SetShader(true);
+	DrawDebugPixelShader->SetShader(true);
+	drawDebug->Draw();
 	
 
+	//deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+	
 	// Present the buffer
 	//  - Puts the image we're drawing into the window so the user can see it
 	//  - Do this exactly ONCE PER FRAME
