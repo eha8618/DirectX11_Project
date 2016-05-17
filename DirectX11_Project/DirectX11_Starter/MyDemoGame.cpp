@@ -99,6 +99,8 @@ MyDemoGame::MyDemoGame(HINSTANCE hInstance)
 	meshTwo = nullptr;
 	meshThree = nullptr;
 
+	enableDebugDraw = false; 
+
 	e1 = nullptr;
 	e2 = nullptr;
 	e3 = nullptr;
@@ -277,7 +279,15 @@ void MyDemoGame::UpdatePhysics(float deltaTime)
 
 	//cout << "Sphere height: " << trans.getOrigin().getY() << endl; 
 	
-	
+	//Move vehicle 
+	vehicle->applyEngineForce(engForce, 0);
+	vehicle->setBrake(brakeForce, 0); 
+	vehicle->applyEngineForce(engForce, 1);
+	vehicle->setBrake(brakeForce, 1);
+	vehicle->applyEngineForce(engForce, 2);
+	vehicle->setBrake(brakeForce, 2);
+	vehicle->applyEngineForce(engForce, 3);
+	vehicle->setBrake(brakeForce, 3); 
 	
 
 	/*int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds(); 
@@ -392,7 +402,7 @@ void MyDemoGame::CreateGeometry()
 	/*btCollisionShape* shape1 = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
 	btCollisionShape* shape2 = new btSphereShape(1); */
 	//btStaticPlaneShape* shape1 = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
-	btBoxShape* shape1 = new btBoxShape(btVector3(25, 0.01f, 25));
+	btBoxShape* shape1 = new btBoxShape(btVector3(50, 0.01f, 50));
 	btSphereShape* shape2 = new btSphereShape(1);
 
 
@@ -427,19 +437,23 @@ void MyDemoGame::CreateGeometry()
 	// BULLET VEHICLE -- reference to vehicle demo, and user ainurakne for a wheel problem -------------------------------------------------------------
 	
 	// make chassis with a collision shape and a rigid body, also added to dynamic world
-	btScalar chassisMass(1.0f);
+	btScalar chassisMass(800.0f);
+	//btScalar chassisMass(0.0f);
 	btVector3 chassisInertia(0.0f, 0.0f, 0.0f);
 
-	btCollisionShape* chassisShape = new btBoxShape(btVector3(1.0f, .5f, 2.0f));
+	//btCollisionShape* chassisShape = new btBoxShape(btVector3(1.0f, .5f, 2.0f));
+	btCollisionShape* chassisShape = new btBoxShape(btVector3(2.0f, .5f, 5.0f));
 	btCompoundShape* compound = new btCompoundShape(); 
 	btTransform localTrans; 
 	localTrans.setIdentity(); 
-	localTrans.setOrigin(btVector3(0, 1, 0)); //collider location 
+	//localTrans.setOrigin(btVector3(0, 1, 0)); //collider location 
+	localTrans.setOrigin(btVector3(0, 1.0f, 0)); //collider location 
 	compound->addChildShape(localTrans, chassisShape); 
 
 	btTransform tr; 
 	tr.setIdentity(); 
-	tr.setOrigin(btVector3(0, -5.00f, 0)); //Controls where car spawns/renders 
+	//tr.setOrigin(btVector3(0, -5.0f, 0)); //Controls where car spawns/renders 
+	tr.setOrigin(btVector3(0, 0.0f, 0)); //Controls where car spawns/renders 
 		// meshOne->conMesh;
 		//new btBoxShape(btVector3(1.0f, .5f, 2.0f));
 
@@ -480,33 +494,52 @@ void MyDemoGame::CreateGeometry()
 	dynamicsWorld->addRigidBody(vehicle->getRigidBody()); 
 	dynamicsWorld->addVehicle(vehicle);
 	
-	float connectionHeight = 1.2f; 
+	//Default values
+	/*float connectionHeight = 1.2f; 
 	float CUBE_HALF_EXTENTS = 1.0f; 
 	float suspensionStiffness = 20.0f; 
 	float suspensionDamping = 2.3f; 
 	float suspensionCompression = 4.4f; 
 	float rollInfluence = 0.1f;
-	float wheelFriction = 1000; 
+	float wheelFriction = 1000; */
+	float connectionHeight = 1.2f;
+	//float connectionHeight = 0.0f; 
+	//float CUBE_HALF_EXTENTS = 1.0f;
+	float CUBE_HALF_EXTENTS = 1.75f;
+	float suspensionStiffness = 200.0f;
+	// k * 2.0 *btSqrt(m_suspensionStiffness)
+	float suspensionDamping = .4f * 2.0f * sqrt(suspensionStiffness);
+	float suspensionCompression = 3.0f * 2.0f * sqrt(suspensionStiffness); 
+	float rollInfluence = 0.1f;
+	float wheelFriction = 50;
+	//vehicle->setCoordinateSystem(0, 1, 2);
 	vehicle->setCoordinateSystem(0, 1, 2);
+
 
 	// make wheels, also keep them under the half-length of chassis
 	btVector3 wheelDirectionCS0(0.0f, -1.0f, 0.0f);
 	btVector3 wheelAxleCS(-1.0f, 0.0f, 0.0f);
+	//btScalar suspensionRestLength(0.6f);
 	btScalar suspensionRestLength(0.6f);
 	btScalar wheelRad(0.4f);
+	btScalar suspensionForce(1.0f);
 
 	//btVector3 connectionPointCS0(0, 0, -5);
 
 	btVector3 connectionPointCS0(CUBE_HALF_EXTENTS - (0.3*wheelWidth), connectionHeight, 2 * CUBE_HALF_EXTENTS - wheelRadius);
+	connectionPoints.push_back(connectionPointCS0); 
 	vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, tune, true);
 
 	connectionPointCS0 = btVector3(-CUBE_HALF_EXTENTS + (0.3*wheelWidth), connectionHeight, 2 * CUBE_HALF_EXTENTS - wheelRadius);
+	connectionPoints.push_back(connectionPointCS0);
 	vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, tune, true);
 
 	connectionPointCS0 = btVector3(-CUBE_HALF_EXTENTS + (0.3*wheelWidth), connectionHeight, -2 * CUBE_HALF_EXTENTS + wheelRadius);
+	connectionPoints.push_back(connectionPointCS0);
 	vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, tune, false);
 
 	connectionPointCS0 = btVector3(CUBE_HALF_EXTENTS - (0.3*wheelWidth), connectionHeight, -2 * CUBE_HALF_EXTENTS + wheelRadius);
+	connectionPoints.push_back(connectionPointCS0);
 	vehicle->addWheel(connectionPointCS0, wheelDirectionCS0, wheelAxleCS, suspensionRestLength, wheelRadius, tune, false);
 
 	
@@ -516,9 +549,11 @@ void MyDemoGame::CreateGeometry()
 		btWheelInfo& wheel = vehicle->getWheelInfo(i);
 		wheel.m_suspensionStiffness = suspensionStiffness;
 		wheel.m_wheelsDampingRelaxation = suspensionDamping;
+		//wheel.m_wheelsSuspensionForce = suspensionForce; 
 		wheel.m_wheelsDampingCompression = suspensionCompression;
 		wheel.m_frictionSlip = wheelFriction;
 		wheel.m_rollInfluence = rollInfluence;
+		wheel.m_maxSuspensionForce = 6000.0f;
 	}
 	
 	//cout << vehicle->getChassisWorldTransform().getOrigin().getX() << " " << vehicle->getChassisWorldTransform().getOrigin().getY() << " " << vehicle->getChassisWorldTransform().getOrigin().getZ();
@@ -542,7 +577,9 @@ void MyDemoGame::CreateGeometry()
 	e1 = new Entity(meshThree, material, shape1, groundMotionState, groundRigidBody);
 	e2 = new Entity(meshTwo, material, shape2, fallMotionState, fallRigidBody);
 	e3 = new Entity(meshOne, material, chassisShape, chassisMotionState, chassisRB);
-	e4 = new Entity(meshFour, material, shape2, groundMotionState, fallRigidBody);
+	//e3 = new Entity(meshTwo, material, chassisShape, chassisMotionState, chassisRB);
+
+	/*e4 = new Entity(meshFour, material, shape2, groundMotionState, fallRigidBody);
 	e5 = new Entity(meshFour, material, shape2, groundMotionState, fallRigidBody);
 	e6 = new Entity(meshFour, material, shape2, groundMotionState, fallRigidBody);
 	e7 = new Entity(meshFour, material, shape2, groundMotionState, fallRigidBody);
@@ -551,7 +588,7 @@ void MyDemoGame::CreateGeometry()
 	dynamicsWorld->removeCollisionObject(e4->collider); 
 	dynamicsWorld->removeCollisionObject(e5->collider);
 	dynamicsWorld->removeCollisionObject(e6->collider);
-	dynamicsWorld->removeCollisionObject(e7->collider);
+	dynamicsWorld->removeCollisionObject(e7->collider);*/
 
 
 
@@ -564,10 +601,10 @@ void MyDemoGame::CreateGeometry()
 	entities.push_back(e1);
 	entities.push_back(e2); //Ball
 	entities.push_back(e3);
-	entities.push_back(e4);
+	/*entities.push_back(e4);
 	entities.push_back(e5);
 	entities.push_back(e6);
-	entities.push_back(e7);
+	entities.push_back(e7);*/
 	//entities.push_back(e3);
 	//dynamicsWorld->addRigidBody(entities[0]->collider);
 	//dynamicsWorld->addRigidBody(entities[1]->collider);
@@ -650,46 +687,49 @@ void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 
 	if (GetAsyncKeyState(VK_UP))
 	{
-		/*vehicle->applyEngineForce(engForce, 0);
-		vehicle->applyEngineForce(engForce, 1);*/
-		engForce = 100.0f;
+		engForce = maxEngineForce;
+		brakeForce = 0.0f; 
+	}
+	if (GetAsyncKeyState('G'))
+	{
+		enableDebugDraw = !enableDebugDraw; 
 	}
 	if (GetAsyncKeyState(VK_DOWN))
 	{
-		vehicle->setBrake(brakeForce, 0);
-		vehicle->setBrake(brakeForce, 1);
-		brakeForce = 0;
+		brakeForce = maxBrakeForce; 
+		engForce = 0.0f; 
+
 	}
-	brakeForce = 2;
 
 	for (int i = 0; i < 4; i++)
 	{
 		vehicle->updateWheelTransform(i, true);
+		
 	}
 
 	btVector3 chaPos = vehicle->getChassisWorldTransform().getOrigin();
-
-	//e3->CopyTransformFromBullet();
 	
 	//e3->setPosition(chaPos.getX(), chaPos.getY(), chaPos.getZ());
 
-	btVector3 frRWheel = vehicle->getWheelInfo(0).m_worldTransform.getOrigin();
-	//e4->CopyTransformFromBullet();
-	e4->setPosition(frRWheel.getX(), frRWheel.getY(), frRWheel.getZ());
+	//btVector3 frRWheel = vehicle->getWheelInfo(0).m_worldTransform.getOrigin(); 
+	////frRWheel = frRWheel - connectionPoints[0]; 
 
-	btVector3 frLWheel = vehicle->getWheelInfo(1).m_worldTransform.getOrigin();
-	//e5->CopyTransformFromBullet();
-	e5->setPosition(frLWheel.getX(), frLWheel.getY(), frLWheel.getZ());
+	//e4->setPosition(frRWheel.getX(), frRWheel.getY(), frRWheel.getZ());
 
-	btVector3 baRWheel = vehicle->getWheelInfo(2).m_worldTransform.getOrigin();
-	//e6->CopyTransformFromBullet();
-	e6->setPosition(baRWheel.getX(), baRWheel.getY(), baRWheel.getZ());
+	//btVector3 frLWheel = vehicle->getWheelInfo(1).m_worldTransform.getOrigin();
+	////btVector3 frLWheel = connectionPoints[1];
+	//e5->setPosition(frLWheel.getX(), frLWheel.getY(), frLWheel.getZ());
 
-	btVector3 baLWheel = vehicle->getWheelInfo(3).m_worldTransform.getOrigin();
-	//e7->CopyTransformFromBullet();
-	e7->setPosition(baLWheel.getX(), baLWheel.getY(), baLWheel.getZ());
 
-	//drawDebug->drawLine(btVector3(0.0f, 0.0f, 0.0f), btVector3(0.0f, 1.0f, 0.0f), btVector3(1.0f, 0.0f, 0.0f)); 
+	//btVector3 baRWheel = vehicle->getWheelInfo(2).m_worldTransform.getOrigin();
+	////btVector3 baRWheel = connectionPoints[2];
+	//e6->setPosition(baRWheel.getX(), baRWheel.getY(), baRWheel.getZ());
+
+	//btVector3 baLWheel = vehicle->getWheelInfo(3).m_worldTransform.getOrigin();
+	////btVector3 baLWheel = connectionPoints[3];
+	//e7->setPosition(baLWheel.getX(), baLWheel.getY(), baLWheel.getZ());
+
+	
 
 	//constants that control movement  
 	float speed = 0.0025f * deltaTime;
@@ -804,11 +844,19 @@ void MyDemoGame::DrawScene(float deltaTime, float totalTime)
 	}
 	//Testing debug lines 
 	//Debug lines 
-	dynamicsWorld->debugDrawWorld();
+	if (enableDebugDraw)
+	{
+		dynamicsWorld->debugDrawWorld();
+	}
+	
 	//drawDebug->drawLine(btVector3(0.0f, 0.0f, 0.0f), btVector3(0.0f, 1.0f, 1.0f), btVector3(1.0f, 0.0f, 0.0f)); 
 	DrawDebugVertexShader->SetShader(true);
 	DrawDebugPixelShader->SetShader(true);
-	drawDebug->Draw();
+	if (enableDebugDraw)
+	{
+		drawDebug->Draw();
+	}
+	
 	
 
 	//deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

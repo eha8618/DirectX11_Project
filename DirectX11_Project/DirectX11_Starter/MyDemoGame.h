@@ -58,8 +58,13 @@ public:
 
 	void UpdatePhysics(float deltaTime); 
 
-	int engForce = 40;
-	int brakeForce = 2;
+	float engForce = 0.0f;
+	float brakeForce = 0.0f;
+	float maxEngineForce = 500.0f; 
+	float maxBrakeForce = 2000.0f; 
+	vector<btVector3> connectionPoints; 
+
+	bool enableDebugDraw; 
 
 
 

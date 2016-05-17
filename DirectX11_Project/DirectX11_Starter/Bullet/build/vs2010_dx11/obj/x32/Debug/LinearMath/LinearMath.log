@@ -1,4 +1,4 @@
-﻿Build started 5/16/2016 5:33:27 PM.
+﻿Build started 5/16/2016 11:00:55 PM.
      1>Project "C:\Users\Dakota\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\build\vs2010_dx11\LinearMath.vcxproj" on node 4 (Build target(s)).
      1>Lib:
          LinearMath.vcxproj -> C:\Users\Dakota\Desktop\DirectX11_Project\DirectX11_Project\DirectX11_Starter\Bullet\build\vs2010_dx11\..\..\lib\LinearMath_vs2010_debug.lib
@@ -6,4 +6,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.68
+Time Elapsed 00:00:00.24
