@@ -60,11 +60,15 @@ public:
 
 	float engForce = 0.0f;
 	float brakeForce = 0.0f;
-	float maxEngineForce = 500.0f; 
-	float maxBrakeForce = 2000.0f; 
+	float maxEngineForce = 2000.0f; 
+	float maxBrakeForce = 200.0f; 
+	float steeringForce = 0.0f; 
+	float steeringIncrement = 0.04f;
+	float steeringClamp = 0.3f;
 	vector<btVector3> connectionPoints; 
 
 	bool enableDebugDraw; 
+
 
 
 

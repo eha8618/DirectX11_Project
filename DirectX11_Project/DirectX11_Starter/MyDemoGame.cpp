@@ -217,7 +217,7 @@ bool MyDemoGame::Init()
 
 	// Directional Lights 
 	directionalLight.AmbientColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-	directionalLight.DiffuseColor = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	directionalLight.DiffuseColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	directionalLight.Direction = XMFLOAT3(-1.0f, -1.0f, 0.0f);
 	pixelShader->SetData(
 		"directionalLight",	//name in shader variables
@@ -226,7 +226,7 @@ bool MyDemoGame::Init()
 
 
 	directionalLight2.AmbientColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f);
-	directionalLight2.DiffuseColor = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	directionalLight2.DiffuseColor = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	directionalLight2.Direction = XMFLOAT3(0.0f, -1.0f, 1.0f);
 	pixelShader->SetData(
 		"directionalLight2",	//name in shader variable
@@ -245,10 +245,10 @@ bool MyDemoGame::Init()
 	pixelShader->SetData("camPos", &cam->getPosition(), sizeof(XMFLOAT3));
 
 	// Specular Lights 
-	specularLight.SpecularColor = XMFLOAT4(1.0f, 0.1449275f, 0.0f, 1.0f);
+	specularLight.SpecularColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	specularLight.Direction = XMFLOAT3(1.0f, -1.0f, -5.0f);
-	specularLight.SpecularStrength = 0.75f;
-	specularLight.LightIntensity = 0.5f;
+	specularLight.SpecularStrength = 1.0f;
+	specularLight.LightIntensity = 1.0f;
 	pixelShader->SetData(
 		"specularLight",	//name in shader variable
 		&specularLight,	// address in memory
@@ -288,6 +288,10 @@ void MyDemoGame::UpdatePhysics(float deltaTime)
 	vehicle->setBrake(brakeForce, 2);
 	vehicle->applyEngineForce(engForce, 3);
 	vehicle->setBrake(brakeForce, 3); 
+
+	//Turn Vehicle - Front two wheels
+	vehicle->setSteeringValue(steeringForce, 0); 
+	vehicle->setSteeringValue(steeringForce, 1); 
 	
 
 	/*int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds(); 
@@ -689,6 +693,21 @@ void MyDemoGame::UpdateScene(float deltaTime, float totalTime)
 	{
 		engForce = maxEngineForce;
 		brakeForce = 0.0f; 
+	}
+	if (GetAsyncKeyState(VK_LEFT))
+	{
+		steeringForce -= steeringIncrement;
+		if (steeringForce < -steeringClamp)
+			steeringForce = -steeringClamp;
+		
+
+	}
+	if (GetAsyncKeyState(VK_RIGHT))
+	{
+		steeringForce += steeringIncrement;
+		if (steeringForce > steeringClamp)
+			steeringForce = steeringClamp;
+		
 	}
 	if (GetAsyncKeyState('G'))
 	{
